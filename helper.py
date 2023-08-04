@@ -5,6 +5,7 @@ from loguru import logger
 from datetime import datetime
 from workGDrive import *
 from telebot.types import InputMediaPhoto
+from workRedis import *
 # any
 def time_epoch():
     from time import mktime
@@ -43,7 +44,6 @@ def slice_str_phone(message:str,):
     b = slice_str(message, 'Номер телефона клиента:','Конфигурация').strip()
     logger.info(f'вырезаный телефон ', b)
     return b
-
 
 def sum_dict_values(dict1, dict2):
     result = {}
@@ -106,6 +106,7 @@ def download_file(url):
 #Google Drive 
 @logger.catch
 def download_photo(urlExtract, URL_USERS, userID,):
+
     #urlExtract = message_content
     #if urlExtract is None:
     #    return URL_USERS, [], 0
@@ -155,3 +156,22 @@ def download_photo(urlExtract, URL_USERS, userID,):
     #    logger.error(e)
         #answer = 'Извините сейчас не могу найти актуальную ссылку'
     return URL_USERS, media_group, nameProject
+
+#telegram 
+def summary(userID, error, isDEBUG):
+    if isDEBUG : bot.send_message(userID, error)
+        #bot.send_message(userID, 'начинаю sammury: ответ может занять больше времени, но не более 3х минут')
+    history = get_history(str(userID))
+    summaryHistory = gpt.summarize_questions(history)
+    logger.info(f'summary истории {summaryHistory}')
+
+    history = [summaryHistory]
+    history.extend([{'role':'user', 'content': text}])
+    add_old_history(userID,history)
+    history = get_history(str(userID))
+    logger.info(f'история после summary {history}')
+    
+    answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
+    bot.send_message(message.chat.id, answer)
+    add_message_to_history(userID, 'assistant', answer)
+    

@@ -1,5 +1,4 @@
 import os
-import random
 import telebot
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
@@ -7,7 +6,6 @@ from pprint import pprint
 from chat import GPT
 from datetime import datetime
 import workYDB
-import redis
 import json
 from loguru import logger
 import sys
@@ -20,35 +18,43 @@ from workRedis import *
 import workGS
 from workFaiss import *
 load_dotenv()
-
+isDEBUG = True
 
 logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 logger.add("file_1.log", rotation="50 MB")
 gpt = GPT()
 GPT.set_key(os.getenv('KEY_AI'))
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
-sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','цены на дома 4.0 актуально ')
+#sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','цены на дома 4.0 актуально ')
 sql = workYDB.Ydb()
 
 URL_USERS = {}
 
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
-gsText, urls_photo = sheet.get_gs_text()
+#gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
-model_index=gpt.load_search_indexes(MODEL_URL, gsText=gsText)
-model_project = gpt.create_embedding(gsText)
+# model_index=gpt.load_search_indexes(MODEL_URL, gsText=gsText)
+# model_project = gpt.create_embedding(gsText)
 PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
 model= gpt.load_prompt(PROMT_URL)
-PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
-PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
 
-info_db=create_info_vector()
+PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
+#PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
+
+
+
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
     sql.set_payload(message.chat.id, 'addmodel')
     bot.send_message(message.chat.id, 
-        "Пришлите ссылку promt google document и через пробел название модели (model1). Не используйте уже существующие названия модели\n Внимани! конец ссылки должен вылядить так /edit?usp=sharing",)
+        "Пришлите ссылку model google document и через пробел название модели (model1). Не используйте уже существующие названия модели\n Внимани! конец ссылки должен вылядить так /edit?usp=sharing",)
+
+@bot.message_handler(commands=['addpromt'])
+def add_new_model(message):
+    sql.set_payload(message.chat.id, 'addpromt')
+    bot.send_message(message.chat.id, 
+        "Пришлите ссылку promt google document и через пробел название промта (promt1). Не используйте уже существующие названия модели\n Внимани! конец ссылки должен вылядить так /edit?usp=sharing",)
     
 
 @bot.message_handler(commands=['help', 'start'])
@@ -57,11 +63,10 @@ def say_welcome(message):
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}
-    row = {'id': message.chat.id, 'model': '', 'promt': '','nicname':username, 'payload': ''}
+    row = {'id': message.chat.id, 'model': 'model1', 'promt': 'promt1','nicname':username, 'payload': ''}
     sql.replace_query('user', row)
     
-    text = """Здравствуйте, я AI ассистент компании Сканди ЭкоДом. Я отвечу на Ваши вопросы по поводу строительства загородного дома и задам свои 😁. Хотите я Вам расскажу про варианты комплектации домов?
-    """
+    text = """ЗЗдравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
     bot.send_message(message.chat.id, text, 
                      parse_mode='markdown',
                      reply_markup= create_menu_keyboard())
@@ -93,12 +98,6 @@ def send_button(message):
     bot.send_message(message.chat.id, 
         "Контекст сброшен",reply_markup=create_menu_keyboard(),)
 
-@bot.message_handler(commands=['model1'])
-def dialog_model1(message):
-    #payload = sql.get_payload(message.chat.id)
-    sql.set_payload(message.chat.id, 'model1')
-    bot.send_message(message.chat.id,'Что вы хотите узнать?',)
-
 @bot.message_handler(content_types=['photo'])
 def handle_photo(message):
      # Получаем информацию о фото
@@ -110,7 +109,7 @@ def handle_photo(message):
     file_info = bot.get_file(file_id)
     file_url = f"https://api.telegram.org/file/bot{os.getenv('TELEBOT_TOKEN')}/{file_info.file_path}" 
     fileName = download_file(file_url)
-    create_lead_and_attach_file([fileName], username)
+    #create_lead_and_attach_file([fileName], username)
     bot.reply_to(message, f'Спасибо, мы просчитаем Ваш проект и свяжемся с вами')
 
 @bot.message_handler(content_types=['document'])
@@ -124,7 +123,7 @@ def handle_document(message):
     file_url = f"https://api.telegram.org/file/bot{os.getenv('TELEBOT_TOKEN')}/{file_info.file_path}"
         # Отправляем ответное сообщение
     fileName = download_file(file_url)
-    create_lead_and_attach_file([fileName], username)
+    #create_lead_and_attach_file([fileName], username)
     bot.reply_to(message, f'Спасибо, мы просчитаем Ваш проект и свяжемся с вами')
     
 
@@ -139,19 +138,25 @@ def any_message(message):
     text = message.text
     userID= message.chat.id
     payload = sql.get_payload(userID)
-
+    
     if payload == 'addmodel':
         text = text.split(' ')
         rows = {'model': text[1], 'url': text[0] }
-        #sql.insert_query('model',rows)
         sql.replace_query('model',rows)
         return 0
+    
+    if payload == 'addpromt':
+        text = text.split(' ')
+        rows = {'promt': text[1], 'url': text[0] }
+        sql.replace_query('prompt',rows)
+        return 0
+    
     
     add_message_to_history(userID, 'user', text)
     history = get_history(str(userID))
     logger.info(f'история {history}')
 
-
+    #для теста почему-то иногда бывыет битая ссылка
     try:
         logger.info(f'{PROMT_URL}')
         model= gpt.load_prompt(PROMT_URL) 
@@ -162,22 +167,15 @@ def any_message(message):
         
     try:
         if text == 'aabb':
+            #принудительная саммари диалога
             1/0
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, lastMessage+text, history, model_index,temp=0.5, verbose=0)
     
         logger.info(f'ответ сети если нет ощибок: {answer}')
     except Exception as e:
-        bot.send_message(userID, e)
-        #bot.send_message(userID, 'начинаю sammury: ответ может занять больше времени, но не более 3х минут')
-        history = get_history(str(userID))
-        summaryHistory1 = gpt.summarize_questions(history)
-        logger.info(f'summary истории1 {summaryHistory1}')
-   
-        history = [summaryHistory1]
-        history.extend([{'role':'user', 'content': text}])
-        add_old_history(userID,history)
-        history = get_history(str(userID))
-        logger.info(f'история после summary {history}')
+        #саммари если превышено колтчество токенов
+        if isDEBUG : bot.send_message(userID, e)
+        history = summary(userID, e) 
         
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
         bot.send_message(message.chat.id, answer)

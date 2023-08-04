@@ -212,6 +212,26 @@ class Ydb:
                 commit_tx=True,
             )
         return pool.retry_operation_sync(a)
+    
+    def set_promt(self, userID: int, entity:str):
+        query = f'UPDATE user SET promt = "{entity}" WHERE id = {userID}'
+        #print(query)
+        def a(session):
+            session.transaction(ydb.SerializableReadWrite()).execute(
+                query,
+                commit_tx=True,
+            )
+        return pool.retry_operation_sync(a)
+    
+    def set_promt(self, userID: int, entity:str):
+        query = f'UPDATE user SET promt = "{entity}" WHERE id = {userID}'
+        #print(query)
+        def a(session):
+            session.transaction(ydb.SerializableReadWrite()).execute(
+                query,
+                commit_tx=True,
+            )
+        return pool.retry_operation_sync(a)
 
     def get_payload(self, whereID: int):
         query = f'SELECT payload FROM user WHERE id = {whereID}'
@@ -223,11 +243,31 @@ class Ydb:
                 commit_tx=True,
             )
         b = pool.retry_operation_sync(a)
-        # string = b_string.decode('utf-8')
-        # IndexError: list index out of range если нет данныйх
-        #print('b',b)
         rez = b[0].rows[0]['payload'].decode('utf-8')
-        #print('rez',rez)
+        return rez
+    
+    def get_promt(self, whereID: int):
+        query = f'SELECT promt FROM user WHERE id = {whereID}'
+        print(query)
+        def a(session):
+            return session.transaction().execute(
+                query,
+                commit_tx=True,
+            )
+        b = pool.retry_operation_sync(a)
+        rez = b[0].rows[0]['payload'].decode('utf-8')
+        return rez
+ 
+    def get_model(self, whereID: int):
+        query = f'SELECT model FROM user WHERE id = {whereID}'
+        print(query)
+        def a(session):
+            return session.transaction().execute(
+                query,
+                commit_tx=True,
+            )
+        b = pool.retry_operation_sync(a)
+        rez = b[0].rows[0]['payload'].decode('utf-8')
         return rez
 
     def select_query(self,tableName: str, where: str):
