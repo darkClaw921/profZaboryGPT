@@ -32,12 +32,12 @@ sql = workYDB.Ydb()
 
 URL_USERS = {}
 
-MODEL_URL= 'https://docs.google.com/document/d/1nMjBCoI3WpWofpVRI0rsi-iHjVSeC358JDwN96UWBrM/edit?usp=sharing'
+MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
 model_index=gpt.load_search_indexes(MODEL_URL, gsText=gsText)
 model_project = gpt.create_embedding(gsText)
-PROMT_URL = 'https://docs.google.com/document/d/1f4GMt2utNHsrSjqwE9tZ7R632_ceSdgK6k-_QwyioZA/edit?usp=sharing'
+PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
 model= gpt.load_prompt(PROMT_URL)
 PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
 PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
@@ -146,9 +146,7 @@ def any_message(message):
         #sql.insert_query('model',rows)
         sql.replace_query('model',rows)
         return 0
-    #context = sql.get_context(userID, payload)
-    #if context is None or context == '' or context == []:
-        #context = text
+    
     add_message_to_history(userID, 'user', text)
     history = get_history(str(userID))
     logger.info(f'история {history}')
@@ -166,78 +164,32 @@ def any_message(message):
         if text == 'aabb':
             1/0
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, lastMessage+text, history, model_index,temp=0.5, verbose=0)
-        
-        # if len(history) < 1: 
-        #     answerInfo = {'type': 'no'} 
-        #     logger.warning(f'{answerInfo=}')
-        # else: 
-        #     answerInfo = answer_info(lastMessage+text, info_db)
-        #     logger.warning(f'{answerInfo=}')
-        # if answerInfo['type'] == 'podb1orka':
-            
-            # bot.send_message(userID, 'Подбираю проекты')
-            # promtPodbor = gpt.load_prompt(PROMT_PODBOR_HOUSE)
-            # logger.warning(f'{promtPodbor=}')
-            # hist =  get_history(str(userID))
-            # logger.info(f'{hist=}')
-            # summary= gpt.summarize_podborka(promtPodbor, history=hist)['content']
-            # #history = [history]
-            # #history.extend([{'role':'user', 'content': text}])
-            # #add_old_history(userID,history)
-            # history = get_history(str(userID))
-        
-            # logger.warning(f'{summary=}')
-            # logger.warning(f'{history=}')
-            # promtSmmary = f'Отправь клиенту подборку наиболее подходящих проектов по этим критериям: {summary}'
-            # #answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, lastMessage+text, history, model_index,temp=0.5, verbose=0)
-            # logger.warning(f'{promtSmmary=}')
-            # history=[]
-            # answer, allToken, allTokenPrice, message_content = gpt.answer_index(promtSmmary, summary, history, model_index,temp=0.5, verbose=0)
-            # bot.send_message(message.chat.id, answer,  parse_mode='markdown') 
-
-            # return 0 
-        #answerProject = gpt.search_project(model_project, lastMessage+answer,4,1)
-        #logger.info(f'{answerProject=}')
+    
         logger.info(f'ответ сети если нет ощибок: {answer}')
-        #print('мы получили ответ \n', answer)
     except Exception as e:
         bot.send_message(userID, e)
         #bot.send_message(userID, 'начинаю sammury: ответ может занять больше времени, но не более 3х минут')
         history = get_history(str(userID))
-        #summaryHistory = gpt.get_summary(history)
         summaryHistory1 = gpt.summarize_questions(history)
         logger.info(f'summary истории1 {summaryHistory1}')
-        #logger.info(f'summary истории {summaryHistory}')
-        #print(f'summary: {summaryHistory}')
-        #logger.info(f'история до summary {history}')
-        #print('история до очистки \n', history)
-        #print('история summary \n', summaryHistory)
-        #clear_history(userID)
+   
         history = [summaryHistory1]
         history.extend([{'role':'user', 'content': text}])
         add_old_history(userID,history)
         history = get_history(str(userID))
         logger.info(f'история после summary {history}')
-        #print('история после очистки\n', history)
         
-        #answer = gpt.answer_index(model, text, history, model_index,temp=0.2, verbose=1)
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
         bot.send_message(message.chat.id, answer)
         add_message_to_history(userID, 'assistant', answer)
 
         return 0 
     
-    #if message_content 
-    #answer, answerBlock = gpt.answer_index(model, context, model_index, verbose=1)
-    #print('answer_index', answer)
+   
     add_message_to_history(userID, 'assistant', answer)
-    #b = gpt.get_summary(history)
-    #print(f'{b=}')
-    #for i in answerBlock:
-    #    bot.send_message(message.chat.id, i)
+
     prepareAnswer= answer.lower()
-    #print(f'{prepareAnswer=}')
-    #print(f"{prepareAnswer.find('спасибо за предоставленный номер')=}") 
+ 
     b = prepareAnswer.find('спасибо за предоставленный номер') 
     print(f'{b=}')
 
@@ -286,15 +238,9 @@ def any_message(message):
         print('запиь в битрикс')
         update_deal(phone, history_answer)
 
-    #try:
-    #    bot.send_media_group(message.chat.id, media_group)
-    #except Exception as e:
-    #    bot.send_message(message.chat.id, e,  parse_mode='markdown')
-
-    #if payload == 'model3':
+    
     now = datetime.now()+timedelta(hours=3)
-    #now = datetime.now()
-# Format the date and time according to the desired format
+
     formatted_date = now.strftime("%Y-%m-%dT%H:%M:%S")
     
     #answer, allToken, allTokenPrice= gpt.answer(' ',mess,)

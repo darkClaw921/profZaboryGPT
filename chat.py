@@ -93,7 +93,7 @@ class GPT():
 
     source_chunks = []
     #splitter = CharacterTextSplitter(separator="\n", chunk_size=1524, chunk_overlap=0)
-    splitter = CharacterTextSplitter(separator="<", chunk_size=1024, chunk_overlap=300)
+    splitter = CharacterTextSplitter(separator="==========", chunk_size=1024, chunk_overlap=300)
 
     for chunk in splitter.split_text(data):
       source_chunks.append(Document(page_content=chunk, metadata={}))
