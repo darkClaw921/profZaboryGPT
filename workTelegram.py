@@ -16,7 +16,6 @@ from workGDrive import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
-from workFaiss import *
 load_dotenv()
 isDEBUG = True
 
@@ -25,7 +24,7 @@ logger.add("file_1.log", rotation="50 MB")
 gpt = GPT()
 GPT.set_key(os.getenv('KEY_AI'))
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
-#sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','цены на дома 4.0 актуально ')
+sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
 URL_USERS = {}
@@ -33,7 +32,7 @@ URL_USERS = {}
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
-# model_index=gpt.load_search_indexes(MODEL_URL, gsText=gsText)
+model_index=gpt.load_search_indexes(MODEL_URL)
 # model_project = gpt.create_embedding(gsText)
 PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
 model= gpt.load_prompt(PROMT_URL)
@@ -43,6 +42,7 @@ PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnp
 
 
 
+CHECK_WORDS = sheet.get_words_and_urls()
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
@@ -66,7 +66,7 @@ def say_welcome(message):
     row = {'id': message.chat.id, 'model': 'model1', 'promt': 'promt1','nicname':username, 'payload': ''}
     sql.replace_query('user', row)
     
-    text = """ЗЗдравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
+    text = """Здравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
     bot.send_message(message.chat.id, text, 
                      parse_mode='markdown',
                      reply_markup= create_menu_keyboard())
@@ -129,8 +129,9 @@ def handle_document(message):
 
     #create_lead_and_attach_file([],userID)
 
-#@logger.catch
+
 @bot.message_handler(content_types=['text'])
+@logger.catch
 def any_message(message):
     global URL_USERS
     #print('это сообщение', message)
@@ -193,26 +194,26 @@ def any_message(message):
 
     logger.info(f'{message_content=}')
         
-    photoFolder = message_content[0].page_content.find('https://drive') 
-    logger.info(f'{photoFolder=}')
+    # photoFolder = message_content[0].page_content.find('https://drive') 
+    # logger.info(f'{photoFolder=}')
     bot.send_message(message.chat.id, answer,  parse_mode='markdown')
     media_group = []
 
-    if answer.find('КД-') >= 0:
+    photoFolder = -1
+    urls = check_need_words(CHECK_WORDS,prepareAnswer)
+    if urls != [] :
         photoFolder = 1
 
     if photoFolder >= 0:
         logger.info(f'{URL_USERS=}')
-        pattern = r"КД-\d+"
+        # pattern = r"КД-\d+"
 
-        matches = re.findall(pattern, answer)
-        matches = list(set(matches))
+        # matches = re.findall(pattern, answer)
+        # matches = list(set(matches))
         #TODO удалить если нужно чтобы фото отправлялись по 1 разу
         #URL_USERS={}
         bot.send_message(message.chat.id, 'Подождите, ищу фото проектов...',  parse_mode='markdown')
-        for project in matches:
-            url = urls_photo[project]
-            #media_group.extend(media_group1)
+        for url in urls:
             try:
                 URL_USERS, media_group,nameProject = download_photo(url,URL_USERS,userID,)
                 if media_group == []:

@@ -81,6 +81,28 @@ def create_media_gorup(lst:list):
         
     return media_group
 
+
+
+
+        
+#Google Sheet
+@logger.catch
+def check_need_words(data:list, text:str):
+    ursl=[]
+    for item in data:
+        if any(word in text for word in item['words']):
+            if item['words2'] != ['']:
+                if any(word in text for word in item['words2']):
+                    ursl.append(item['url'])
+                    #return item['url']
+            else:
+                ursl.append(item['url'])
+                #return item['url']
+    return ursl
+    #return False
+
+
+#Google Drive 
 import base64
 import urllib.request
 
@@ -103,7 +125,6 @@ def download_file(url):
     urllib.request.urlretrieve(url, full_path)  # Скачиваем файл по ссылке и сохраняем его по указанному пути
     return full_path
 
-#Google Drive 
 @logger.catch
 def download_photo(urlExtract, URL_USERS, userID,):
 
@@ -174,4 +195,15 @@ def summary(userID, error, isDEBUG):
     answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
     bot.send_message(message.chat.id, answer)
     add_message_to_history(userID, 'assistant', answer)
-    
+
+
+if __name__ == '__main__':
+    data = [{'url': 'https://drive.google.com/drive/folders/18MGvuit-R5PJFyJ902M_DpyQTC6VFzCH',
+  'words': ['из евроштакетника', 'евроштакетник'],
+  'words2': ['шахматка', 'шахматный порядок']},
+ {'url': 'https://drive.google.com/drive/folders/1Vj6JMswjZlnuoEidOmQyl9ZzZ6uv7JIl',
+  'words': ['жалюзи'],
+  'words2': ['']}]
+    text = "Привет это помощник по заборам у нас есть евроштакетник из жалюзи "
+    rez = check_words(data,text)
+    print(rez)

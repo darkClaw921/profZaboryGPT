@@ -32,7 +32,7 @@ def download_files(FOLDER_ID:str, maxFile:int = 5)-> list:
     results = drive.files().list(q=f"'{FOLDER_ID}' in parents", pageSize=20).execute()
     folder_info = drive.files().get(fileId=FOLDER_ID, fields='name').execute()
     items = results.get('files', [])
-    print(items)
+    print(f'{items=}')
     print(f'{folder_info}')
     # Создание папки для скачивания файлов
     download_folder = 'downloads/'

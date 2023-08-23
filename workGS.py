@@ -44,22 +44,30 @@ class Sheet():
         1 - первая строка
         """
         return self.sheet.row_values(i)
-    
-    def get_gs_text(self):
-        allText = '\n\n<Описание Проектов>'
-        urls={}
-        b =1
-        for i in tqdm(range(2,118)):
+    def get_words_and_urls(self):
+        lst = []
+        for i in tqdm(range(2,11)):
+            value = self.get_rom_value(i)
+            lst.extend(prepare_words(value))
             #print(f'{b=}')
-            #TODO удалить потом
-            #if b == 2: 
-            #    return allText, urls
-            text = self.get_rom_value(i)
-            time.sleep(1.2)
-            a, url= prepare_text(text)
-            allText += a
-            urls.update(url)
-            b += 1
+
+        return lst
+
+    # def get_gs_text(self):
+    #     allText = '\n\n<Описание Проектов>'
+    #     urls={}
+    #     b =1
+    #     for i in tqdm(range(2,118)):
+    #         #print(f'{b=}')
+    #         #TODO удалить потом
+    #         #if b == 2: 
+    #         #    return allText, urls
+    #         text = self.get_rom_value(i)
+    #         time.sleep(1.2)
+    #         a, url= prepare_text(text)
+    #         allText += a
+    #         urls.update(url)
+    #         b += 1
         return allText, urls
 
 @dataclass
@@ -79,48 +87,34 @@ class table:
     K :int = 10
     L :int = 11
     M :int = 12
-    
-def prepare_text(lst:list):
+
+@logger.catch
+def prepare_words(lst:list):
     text = ''
-    urls = {}
-    try:
-        lst[table.H]=lst[table.H].replace('\xa0', ' ')
-        lst[table.I]=lst[table.I].replace('\xa0', ' ')
-        lst[table.J]=lst[table.J].replace('\xa0', ' ')
-    except Exception as e:
-        print('ошибка в GS prepare_text ',e)
-        text = f"""
-<Проект: {lst[table.C]}>""" 
-        return text
+    l = []
+    words = lst[table.A].split(',')
+    words = [word.lower().strip() for word in words]
+    #print(f'{words=}')
+    words2 = lst[table.B].split(',')
+    words2 = [word.strip() for word in words2]
+    l.append({'words':words,
+               'words2': words2,
+               'url':lst[table.C]})
     
-    text = f"""
-<Проект: {lst[table.C]}>
+    #print(f'{text=}')
+    #urls.setdefault(lst[table.C], lst[table.I])
+    return l 
 
-м.кв.: {lst[table.F]}
-
-Количество этажей: {lst[table.D]}
-Стиль: {lst[table.E]}
-
-{lst[table.G]}
-{lst[table.H]}
-
-Стоимость {lst[table.C]}:
-ЗК: {lst[table.J]}
-ТК: {lst[table.K]}
-ВО: {lst[table.L]}
-
-Фото проекта:{lst[table.C]}
-{lst[table.I]}
-    """
-    print(f'{text=}')
-    urls.setdefault(lst[table.C], lst[table.I])
-    return text,urls 
 
 
 
 if __name__ == '__main__':
     json = 'kgtaprojects-8706cc47a185.json'
-    sheet = Sheet(json,'цены на дома 4.0 актуально ')
-    a = sheet.get_rom_value(113) 
-    a = prepare_text(a)
+    sheet = Sheet(json,'Ссылки на изображения')
+    #a = sheet.get_rom_value(7) 
+    a = sheet.get_words_and_urls()
     pprint(a)
+    #for aa in a:
+    #    print(f'{aa=}')
+    #a = prepare_text(a)
+    #pprint(a)
