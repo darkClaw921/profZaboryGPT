@@ -9,13 +9,14 @@ import workYDB
 import json
 from loguru import logger
 import sys
-from createKeyboard import create_menu_keyboard
+from createKeyboard import create_menu_keyboard,keyboard_quest4
 from workBitrix import *
 from helper import *
 from workGDrive import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
+from calcWork import create_pdf
 load_dotenv()
 isDEBUG = True
 
@@ -28,6 +29,7 @@ sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изо�
 sql = workYDB.Ydb()
 
 URL_USERS = {}
+QUESTS_USERS = {}
 
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
@@ -49,6 +51,20 @@ def add_new_model(message):
     sql.set_payload(message.chat.id, 'addmodel')
     bot.send_message(message.chat.id, 
         "Пришлите ссылку model google document и через пробел название модели (model1). Не используйте уже существующие названия модели\n Внимани! конец ссылки должен вылядить так /edit?usp=sharing",)
+
+
+@bot.message_handler(commands=['calc'])
+def add_new_model(message):
+    #sql.set_payload(message.chat.id, 'addmodel')
+    try:
+        path = create_pdf()
+    except:
+        path = 'file.pdf'
+    with open(path, 'rb') as pdf_file:
+        # Отправьте PDF-файл пользователю, указав параметр filename
+        bot.send_document(message.chat.id, pdf_file, )#filename='file.pdf')
+    bot.send_message(message.chat.id, 
+        "Вот пример расчета",)
 
 @bot.message_handler(commands=['addpromt'])
 def add_new_model(message):
@@ -130,16 +146,57 @@ def handle_document(message):
     #create_lead_and_attach_file([],userID)
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call): 
+    userID = call.message.chat.id
+    tol = call.data.split('_')[1]
+    print('callback: ',tol)
+    QUESTS_USERS[userID].append(tol)
+    bot.send_message(userID,f'вот {QUESTS_USERS[userID]=}')
+    sql.set_payload(userID, 'exit')
+    bot.answer_callback_query(call.id)
+
+
 @bot.message_handler(content_types=['text'])
 @logger.catch
 def any_message(message):
-    global URL_USERS
+    global URL_USERS, QUESTS_USERS
     #print('это сообщение', message)
     #text = message.text.lower()
     text = message.text
     userID= message.chat.id
     payload = sql.get_payload(userID)
     
+
+    if text == 'calc':
+        sql.set_payload(userID, 'quest1')
+        bot.send_message(userID,'Какая длина?')
+        return 0
+    
+    if payload == 'quest1':
+        QUESTS_USERS.setdefault(userID,[text])
+        bot.send_message(userID,'Какая высота?')
+        sql.set_payload(userID, 'quest2')
+        return 0
+
+    if payload == 'quest2':
+        QUESTS_USERS[userID].append(text)
+        bot.send_message(userID,'Сколько ворот?')
+        sql.set_payload(userID, 'quest3')
+        return 0
+    
+    if payload == 'quest3':
+        QUESTS_USERS[userID].append(text)
+        bot.send_message(userID,'Сколько калиток?')
+        sql.set_payload(userID, 'quest4')
+        return 0
+    
+    if payload == 'quest4':
+        QUESTS_USERS[userID].append(text)
+        bot.send_message(userID,'выберите толщину',reply_markup=keyboard_quest4())
+        sql.set_payload(userID, 'quest5')
+        return 0
+
     if payload == 'addmodel':
         text = text.split(' ')
         rows = {'model': text[1], 'url': text[0] }

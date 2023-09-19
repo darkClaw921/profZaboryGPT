@@ -5,6 +5,8 @@ __pycache__/
 /aa
 /downloads
 /downloadsProject
+*.pdf
+*.html
 # C extensions
 *.so
 *.pkl

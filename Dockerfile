@@ -27,7 +27,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 EXPOSE 5002
 
 # Копируем файл .env внутрь контейнера
-COPY .env txt.json GDtxt.json kgtaprojects-8706cc47a185.json /app/
+COPY .env authorized_key-2.json GDtxt.json kgtaprojects-8706cc47a185.json /app/
 RUN chmod +x /app/run.sh
 CMD ["/app/run.sh"]
 #CMD ["python", "workFlask.py"]
