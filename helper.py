@@ -4,6 +4,7 @@ from loguru import logger
 #import datetime 
 from datetime import datetime
 from workGDrive import *
+from workGS import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 # any
@@ -101,6 +102,18 @@ def check_need_words(data:list, text:str):
     return ursl
     #return False
 
+def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
+    copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
+    sheet = Sheet('GDtxt.json',sheetName)
+    if typeMaterial == 'profNastil':
+        sheet.send_cell('B2', values[1])
+        sheet.send_cell('B3', values[2])
+        # sheet.send_cell('C1', values[2])
+        # sheet.send_cell('D1', values[3])
+        # sheet.send_cell('E1', values[4])
+        # sheet.send_cell('F1', values[5])
+        # sheet.send_cell('G1', values[6])
+    pass
 
 #Google Drive 
 import base64

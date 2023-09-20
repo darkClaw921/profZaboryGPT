@@ -9,7 +9,7 @@ import workYDB
 import json
 from loguru import logger
 import sys
-from createKeyboard import create_menu_keyboard,keyboard_quest4
+from createKeyboard import *
 from workBitrix import *
 from helper import *
 from workGDrive import *
@@ -17,6 +17,7 @@ from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
 from calcWork import create_pdf
+from questions import *
 load_dotenv()
 isDEBUG = True
 
@@ -28,23 +29,24 @@ bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
+TYPE_QUESTIONS = {'profNastil': questionProfNastil,} 
 URL_USERS = {}
 QUESTS_USERS = {}
 
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
-model_index=gpt.load_search_indexes(MODEL_URL)
+## model_index=gpt.load_search_indexes(MODEL_URL)
 # model_project = gpt.create_embedding(gsText)
 PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
-model= gpt.load_prompt(PROMT_URL)
+##model= gpt.load_prompt(PROMT_URL)
 
 PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
 #PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
 
 
 
-CHECK_WORDS = sheet.get_words_and_urls()
+## CHECK_WORDS = sheet.get_words_and_urls()
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
@@ -147,55 +149,75 @@ def handle_document(message):
 
 
 @bot.callback_query_handler(func=lambda call: True)
-def callback_inline(call): 
-    userID = call.message.chat.id
-    tol = call.data.split('_')[1]
-    print('callback: ',tol)
-    QUESTS_USERS[userID].append(tol)
+def callback_inline(callFull):
+    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS
+    userID = callFull.message.chat.id
+    call = callFull.data.split('_')
+    logger.debug(f'{call=}')
+    if call[0] == 'type':
+        bot.send_message(userID, TYPE_QUESTIONS[call[1]]['1']['text'],reply_markup=TYPE_QUESTIONS[call[1]]['1']['keyboard'])
+        sql.set_payload(userID, f'quest_2_{call[1]}')
+        QUESTS_USERS.setdefault(userID,[call[1]])
+        bot.answer_callback_query(callFull.id)
+        return 0
+    
+    if call[0] == 'profNastil':    
+        payload = sql.get_payload(userID)
+        quest = str(int(payload.split('_')[1]))
+        logger.debug(f'{quest=}')
+        typeQuest = payload.split('_')[2]
+        listQuestions = TYPE_QUESTIONS[typeQuest]
+         
+        
+        bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
+        QUESTS_USERS[userID].append(call[1])
+        sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
+        bot.answer_callback_query(callFull.id)
+        
+        return 0
+    
     bot.send_message(userID,f'вот {QUESTS_USERS[userID]=}')
-    sql.set_payload(userID, 'exit')
-    bot.answer_callback_query(call.id)
+    # sql.set_payload(userID, 'exit')
+    
 
 
 @bot.message_handler(content_types=['text'])
 @logger.catch
 def any_message(message):
-    global URL_USERS, QUESTS_USERS
+    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS
     #print('это сообщение', message)
     #text = message.text.lower()
     text = message.text
     userID= message.chat.id
+    username = message.from_user.username
     payload = sql.get_payload(userID)
     
 
     if text == 'calc':
-        sql.set_payload(userID, 'quest1')
-        bot.send_message(userID,'Какая длина?')
+        sql.set_payload(userID, 'quest_1')
+        bot.send_message(userID,'Из какого материала хотите забор?',reply_markup=keyboard_quest1())
         return 0
     
-    if payload == 'quest1':
-        QUESTS_USERS.setdefault(userID,[text])
-        bot.send_message(userID,'Какая высота?')
-        sql.set_payload(userID, 'quest2')
-        return 0
+    if payload.startswith('quest'):
+        QUESTS_USERS[userID].append(text)
+        quest = payload.split('_')[1]
+        logger.debug(f'{quest=}')
+        typeQuest = payload.split('_')[2]
+        listQuestions = TYPE_QUESTIONS[typeQuest]
+        try:
+            bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
+        except Exception as e:
+            logger.debug(f'{e=}')
+            bot.send_message(userID,'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами')
+            sql.set_payload(userID, 'exit')
+            bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+            send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}')   
+            return 0
+        
+        sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
+        return 0 
 
-    if payload == 'quest2':
-        QUESTS_USERS[userID].append(text)
-        bot.send_message(userID,'Сколько ворот?')
-        sql.set_payload(userID, 'quest3')
-        return 0
-    
-    if payload == 'quest3':
-        QUESTS_USERS[userID].append(text)
-        bot.send_message(userID,'Сколько калиток?')
-        sql.set_payload(userID, 'quest4')
-        return 0
-    
-    if payload == 'quest4':
-        QUESTS_USERS[userID].append(text)
-        bot.send_message(userID,'выберите толщину',reply_markup=keyboard_quest4())
-        sql.set_payload(userID, 'quest5')
-        return 0
+
 
     if payload == 'addmodel':
         text = text.split(' ')
@@ -303,7 +325,7 @@ def any_message(message):
     row = {'all_price': float(allTokenPrice), 'all_token': int(allToken), 'all_messages': 1}
     sql.plus_query_user('user', row, f"id={userID}")
     
-    username = message.from_user.username
+    
     rows = {'time_epoch': time_epoch(),
             'MODEL_DIALOG': payload,
             'date': formatted_date,

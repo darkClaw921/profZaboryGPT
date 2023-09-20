@@ -70,6 +70,14 @@ class Sheet():
     #         b += 1
         return allText, urls
 
+    def copy_sheet(self, name:str):
+        # self.sheet.duplicate(insert_sheet_index=1, new_sheet_name=name) копия листа
+        # self.client.copy('1Q5YXUfKD8-KV9hOWfagvv9dtGxGIGagmKeGnhQBRzmQ', title=name, copy_permissions=True)
+        # worksheet = self.client.open(name)
+        # worksheet.share("gerasimov.98.igor@gmail.com", perm_type='user', role='writer')
+        # worksheet.share("kgta-34@kgtaprojects.iam.gserviceaccount.com", perm_type='user', role='writer')
+        pass
+    
 @dataclass
 class table:
     #номер колонки
@@ -110,9 +118,10 @@ def prepare_words(lst:list):
 
 if __name__ == '__main__':
     json = 'kgtaprojects-8706cc47a185.json'
-    sheet = Sheet(json,'Ссылки на изображения')
+    sheet = Sheet(json,'testCopy')
     #a = sheet.get_rom_value(7) 
-    a = sheet.get_words_and_urls()
+    # a = sheet.get_words_and_urls()
+    a = sheet.copy_sheet('testCopy5')
     pprint(a)
     #for aa in a:
     #    print(f'{aa=}')

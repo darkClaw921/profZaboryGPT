@@ -13,7 +13,8 @@ service_account_file = 'GDtxt.json'
 #service_account_file = '/Users/igorgerasimov/Python/Bitrix/test-chatGPT/GDtxt.json'
 credentials = service_account.Credentials.from_service_account_file(service_account_file)
 drive = build('drive', 'v3', credentials=credentials)
-
+# drive.files().copy(fileId='1Q5YXUfKD8-KV9hOWfagvv9dtGxGIGagmKeGnhQBRzmQ', body={'name': 'copy of testCopy1'}).execute()
+# 1/0
 # ID папки в Google Drive
 #folder_id = '1H7rj0sO_jNtd1NbsHhxJDh5VYBuxyHjj'
 
@@ -62,6 +63,16 @@ def download_files(FOLDER_ID:str, maxFile:int = 5)-> list:
 
     print('All files downloaded successfully.')
     return file_list
+
+
+def copy_file(fileID:str, name:str):
+    """Копирует файл
+
+    Args:
+        fileID (str): id файла
+        name (str): имя копии
+    """
+    drive.files().copy(fileId=fileID, body={'name': name}).execute()
 
 if __name__ == '__main__':
     pass
