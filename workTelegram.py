@@ -36,17 +36,17 @@ QUESTS_USERS = {}
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
-## model_index=gpt.load_search_indexes(MODEL_URL)
+model_index=gpt.load_search_indexes(MODEL_URL)
 # model_project = gpt.create_embedding(gsText)
 PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
-##model= gpt.load_prompt(PROMT_URL)
+model= gpt.load_prompt(PROMT_URL)
 
 PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
 #PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
 
 
 
-## CHECK_WORDS = sheet.get_words_and_urls()
+CHECK_WORDS = sheet.get_words_and_urls()
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
