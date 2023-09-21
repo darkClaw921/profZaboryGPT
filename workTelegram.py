@@ -16,7 +16,6 @@ from workGDrive import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
-from calcWork import create_pdf
 from questions import *
 load_dotenv()
 isDEBUG = True
