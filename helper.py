@@ -106,7 +106,7 @@ def check_need_words(data:list, text:str):
    
 
 def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
-    # copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
+    copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
     sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
     # sheet.export_pdf(sheetName) 
     # 1/0
