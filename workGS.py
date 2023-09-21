@@ -8,7 +8,7 @@ from tqdm import tqdm
 class Sheet():
 
     @logger.catch
-    def __init__(self, jsonPath: str, sheetName: str,  servisName: str = None):
+    def __init__(self, jsonPath: str, sheetName: str,  servisName: str = None, get_worksheet: int = 0):
 
         self.scope = ['https://spreadsheets.google.com/feeds',
                       'https://www.googleapis.com/auth/drive']
@@ -16,7 +16,8 @@ class Sheet():
             jsonPath, self.scope)  # Секретынй файл json для доступа к API
         self.client = gspread.authorize(self.creds)
         self.sheet = self.client.open(
-            sheetName).sheet1  # get_worksheet(0)  # Имя таблицы
+            #sheetName).sheet1  # get_worksheet(0)  # Имя таблицы
+            sheetName).get_worksheet(get_worksheet)  # get_worksheet(0)  # Имя таблицы
 
     @logger.catch
     def send_cell(self, cell: str, value, form: bool = False):
@@ -33,7 +34,7 @@ class Sheet():
         else:
             # update(cell, value)
             # value_input_option='USER_ENTERED')
-            self.sheet.update(cell, value)
+            self.sheet.update(cell, value, value_input_option='USER_ENTERED')
 
     def get_cell(self, i, n):
         value = self.sheet.cell(i, n).value
@@ -77,7 +78,7 @@ class Sheet():
         # worksheet.share("gerasimov.98.igor@gmail.com", perm_type='user', role='writer')
         # worksheet.share("kgta-34@kgtaprojects.iam.gserviceaccount.com", perm_type='user', role='writer')
         pass
-    
+
 @dataclass
 class table:
     #номер колонки

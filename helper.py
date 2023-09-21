@@ -104,16 +104,18 @@ def check_need_words(data:list, text:str):
 
 def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
     copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
-    sheet = Sheet('GDtxt.json',sheetName)
+    sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
     if typeMaterial == 'profNastil':
+        print('отправка значений')
+        a = sheet.get_cell(1,1)
+        print(a)
         sheet.send_cell('B2', values[1])
         sheet.send_cell('B3', values[2])
-        # sheet.send_cell('C1', values[2])
-        # sheet.send_cell('D1', values[3])
-        # sheet.send_cell('E1', values[4])
-        # sheet.send_cell('F1', values[5])
-        # sheet.send_cell('G1', values[6])
-    pass
+        sheet.send_cell('B6', str(values[3]).replace('.',','))
+        sheet.send_cell('B16', values[4])
+        sheet.send_cell('B23', values[5])
+        sheet.send_cell('C170', values[6])
+    
 
 #Google Drive 
 import base64
@@ -211,12 +213,15 @@ def summary(userID, error, isDEBUG):
 
 
 if __name__ == '__main__':
-    data = [{'url': 'https://drive.google.com/drive/folders/18MGvuit-R5PJFyJ902M_DpyQTC6VFzCH',
-  'words': ['из евроштакетника', 'евроштакетник'],
-  'words2': ['шахматка', 'шахматный порядок']},
- {'url': 'https://drive.google.com/drive/folders/1Vj6JMswjZlnuoEidOmQyl9ZzZ6uv7JIl',
-  'words': ['жалюзи'],
-  'words2': ['']}]
-    text = "Привет это помощник по заборам у нас есть евроштакетник из жалюзи "
-    rez = check_words(data,text)
-    print(rez)
+#     data = [{'url': 'https://drive.google.com/drive/folders/18MGvuit-R5PJFyJ902M_DpyQTC6VFzCH',
+#   'words': ['из евроштакетника', 'евроштакетник'],
+#   'words2': ['шахматка', 'шахматный порядок']},
+#  {'url': 'https://drive.google.com/drive/folders/1Vj6JMswjZlnuoEidOmQyl9ZzZ6uv7JIl',
+#   'words': ['жалюзи'],
+#   'words2': ['']}]
+#     text = "Привет это помощник по заборам у нас есть евроштакетник из жалюзи "
+#     rez = check_words(data,text)
+#     print(rez)
+    typeQuest = 'profNastil'
+
+    send_values_in_sheet(typeQuest, ['profNastil', '120', '130', '0.2', '4', '5', '220'], f'darkClaw921_{typeQuest}') 
