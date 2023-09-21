@@ -102,9 +102,14 @@ def check_need_words(data:list, text:str):
     return ursl
     #return False
 
+
+   
+
 def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
-    copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
+    # copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
     sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
+    sheet.export_pdf(sheetName) 
+    1/0
     if typeMaterial == 'profNastil':
         print('отправка значений')
         a = sheet.get_cell(1,1)
@@ -115,7 +120,9 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
         sheet.send_cell('B16', values[4])
         sheet.send_cell('B23', values[5])
         sheet.send_cell('C170', values[6])
-    
+    sheet.export_pdf(sheetName)
+    return sheetName
+
 
 #Google Drive 
 import base64

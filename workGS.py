@@ -5,8 +5,9 @@ from dataclasses import dataclass
 from pprint import pprint
 import time
 from tqdm import tqdm
+import requests
 class Sheet():
-
+    
     @logger.catch
     def __init__(self, jsonPath: str, sheetName: str,  servisName: str = None, get_worksheet: int = 0):
 
@@ -15,6 +16,9 @@ class Sheet():
         self.creds = ServiceAccountCredentials.from_json_keyfile_name(
             jsonPath, self.scope)  # Секретынй файл json для доступа к API
         self.client = gspread.authorize(self.creds)
+        self.sheetAll = self.client.open(
+            #sheetName).sheet1  # get_worksheet(0)  # Имя таблицы
+            sheetName)
         self.sheet = self.client.open(
             #sheetName).sheet1  # get_worksheet(0)  # Имя таблицы
             sheetName).get_worksheet(get_worksheet)  # get_worksheet(0)  # Имя таблицы
@@ -78,6 +82,14 @@ class Sheet():
         # worksheet.share("gerasimov.98.igor@gmail.com", perm_type='user', role='writer')
         # worksheet.share("kgta-34@kgtaprojects.iam.gserviceaccount.com", perm_type='user', role='writer')
         pass
+    
+    def export_pdf(self, namePdf):
+        url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704'
+        print(f'{url=}')
+        headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
+        res = requests.get(url, headers=headers)
+        with open(namePdf + ".pdf", 'wb') as f:
+            f.write(res.content)
 
 @dataclass
 class table:

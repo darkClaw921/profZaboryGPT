@@ -211,8 +211,10 @@ def any_message(message):
             bot.send_message(userID,'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами')
             sql.set_payload(userID, 'exit')
             bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
-            send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
-            
+            path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+            with open(path, 'rb') as pdf_file:
+                bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
+                bot.send_document(userID, pdf_file)#filename='file.pdf')
             return 0
         
         sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
