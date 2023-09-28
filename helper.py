@@ -7,6 +7,7 @@ from workGDrive import *
 from workGS import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
+from questions import pokrytie, porydok
 # any
 def time_epoch():
     from time import mktime
@@ -105,22 +106,85 @@ def check_need_words(data:list, text:str):
 
    
 
-def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str):
-    copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
+def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:bool=False):
+    if first:
+        copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
     sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
     # sheet.export_pdf(sheetName) 
     # 1/0
-    if typeMaterial == 'profNastil':
-        print('отправка значений')
+    if typeMaterial == 'profNastil1':
+        print('отправка значений ' + typeMaterial)
         a = sheet.get_cell(1,1)
         print(a)
         sheet.send_cell('B2', str(values[1]).replace('.',','))
         sheet.send_cell('B3', str(values[2]).replace('.',','))
         sheet.send_cell('B6', str(values[3]).replace('.',','))
-        sheet.send_cell('B16', values[4])
-        sheet.send_cell('B23', values[5])
-        sheet.send_cell('C170', values[6])
-    sheet.export_pdf(sheetName)
+        sheet.send_cell('B8', pokrytie[str(values[4])])
+        sheet.send_cell('B16', values[5])
+        sheet.send_cell('B23', values[6])
+        try:
+            sheet.send_cell('C170', values[7])
+        except:
+            1+0
+    if typeMaterial == 'profNastil2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('J2', str(values[1]).replace('.',','))
+        sheet.send_cell('J3', str(values[2]).replace('.',','))
+        sheet.send_cell('J6', str(values[3]).replace('.',','))
+        sheet.send_cell('J8', pokrytie[str(values[4])])
+        sheet.send_cell('J16', values[5])
+        sheet.send_cell('J23', values[6])
+        # sheet.send_cell('C170', values[7])
+    if typeMaterial == 'profNastil3':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('R2', str(values[1]).replace('.',','))
+        sheet.send_cell('R3', str(values[2]).replace('.',','))
+        sheet.send_cell('R6', str(values[3]).replace('.',','))
+        sheet.send_cell('R8', pokrytie[str(values[4])])
+        sheet.send_cell('R16', values[5])
+        sheet.send_cell('R23', values[6])
+    
+    if typeMaterial == 'evroShtak1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('Z2', str(values[1]).replace('.',','))
+        sheet.send_cell('Z3', str(values[2]).replace('.',','))
+        sheet.send_cell('Z6', porydok[str(values[3])])
+        sheet.send_cell('Z8', pokrytie[str(values[4])])
+        sheet.send_cell('Z16', values[5])
+        sheet.send_cell('Z23', values[6])
+        try:
+            sheet.send_cell('C170', values[7])
+        except:
+            1+0
+
+    if typeMaterial == 'evroShtak2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('AH2', str(values[1]).replace('.',','))
+        sheet.send_cell('AH3', str(values[2]).replace('.',','))
+        sheet.send_cell('AH6', porydok(str(values[3])))
+        sheet.send_cell('AH8', pokrytie[str(values[4])])
+        sheet.send_cell('AH16', values[5])
+        sheet.send_cell('AH23', values[6])
+
+    if typeMaterial == 'evroShtak3':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('AP2', str(values[1]).replace('.',','))
+        sheet.send_cell('AP3', str(values[2]).replace('.',','))
+        sheet.send_cell('AP6', porydok(str(values[3])))
+        sheet.send_cell('AP8', pokrytie[str(values[4])])
+        sheet.send_cell('AP16', values[5])
+        sheet.send_cell('AP23', values[6])
+    # sheet.export_pdf(sheetName)
     return sheetName
 
 

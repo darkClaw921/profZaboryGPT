@@ -25,6 +25,7 @@ def create_menu_keyboard():
 def keyboard_quest1():
     keyboard = telebot.types.InlineKeyboardMarkup()
     keyboard.row(telebot.types.InlineKeyboardButton(text='Профнастил', callback_data=f"type_profNastil")) 
+    keyboard.row(telebot.types.InlineKeyboardButton(text='Евроштакетник', callback_data=f"type_evroShtak")) 
     # keyboard.row(telebot.types.InlineKeyboardButton(text='Сетка рабица', callback_data=f"type_setkaRab"))
     # keyboard.row(telebot.types.InlineKeyboardButton(text='Металлический штакетник', callback_data=f"type_metalSh"))
     return keyboard

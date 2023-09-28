@@ -28,10 +28,11 @@ bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
-TYPE_QUESTIONS = {'profNastil': questionProfNastil,} 
+TYPE_QUESTIONS = {'profNastil': questionProfNastil,
+                  'evroShtak':questionEvroShtak} 
 URL_USERS = {}
 QUESTS_USERS = {}
-
+COUNT_ZABOR_USER={}
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
@@ -45,7 +46,7 @@ PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnp
 
 
 
-CHECK_WORDS = sheet.get_words_and_urls()
+# CHECK_WORDS = sheet.get_words_and_urls()
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
@@ -149,18 +150,26 @@ def handle_document(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(callFull):
-    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS
+    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER
     userID = callFull.message.chat.id
     call = callFull.data.split('_')
     logger.debug(f'{call=}')
+    # if call[0] == 'type':
+
+
     if call[0] == 'type':
         bot.send_message(userID, TYPE_QUESTIONS[call[1]]['1']['text'],reply_markup=TYPE_QUESTIONS[call[1]]['1']['keyboard'])
         sql.set_payload(userID, f'quest_2_{call[1]}')
-        QUESTS_USERS.setdefault(userID,[call[1]])
+
+        try:
+            QUESTS_USERS[userID].append([call[1]])
+        except:
+            QUESTS_USERS.setdefault(userID,[[call[1]]])
+
         bot.answer_callback_query(callFull.id)
         return 0
     
-    if call[0] == 'profNastil':    
+    if call[0] == 'profNastil' or call[0] == 'evroShtak':    
         payload = sql.get_payload(userID)
         quest = str(int(payload.split('_')[1]))
         logger.debug(f'{quest=}')
@@ -169,7 +178,7 @@ def callback_inline(callFull):
          
         
         bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
-        QUESTS_USERS[userID].append(call[1])
+        QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(call[1])
         sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
         bot.answer_callback_query(callFull.id)
         
@@ -183,7 +192,7 @@ def callback_inline(callFull):
 @bot.message_handler(content_types=['text'])
 @logger.catch
 def any_message(message):
-    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS
+    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER
     #print('это сообщение', message)
     #text = message.text.lower()
     text = message.text
@@ -193,30 +202,93 @@ def any_message(message):
     
 
     if text == 'calc':
-        sql.set_payload(userID, 'quest_1')
-        bot.send_message(userID,'Из какого материала хотите забор?',reply_markup=keyboard_quest1())
+        sql.set_payload(userID, 'quest_0')
+        bot.send_message(userID,'Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)',)
+        return 0
+    
+    if payload == 'quest_0':
+        sql.set_payload(userID, 'quest_1') 
+        try:
+            COUNT_ZABOR_USER[userID]['real'] += 1  
+        except:
+            COUNT_ZABOR_USER.setdefault(userID, {'max':int(text),
+                                                 'real': 1,
+                                                 'profNastil': 1,
+                                                 'evroShtak':1})
+        numberZabor = COUNT_ZABOR_USER[userID]['real'] 
+        bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
         return 0
     
     if payload.startswith('quest'):
-        QUESTS_USERS[userID].append(text)
+        QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(text)
         quest = payload.split('_')[1]
         logger.debug(f'{quest=}')
+        logger.debug(f'{text=}')
         typeQuest = payload.split('_')[2]
         listQuestions = TYPE_QUESTIONS[typeQuest]
         try:
-            bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
+            bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard']) 
         except Exception as e:
-            logger.debug(f'{e=}')
+
+            # logger.debug(f'{e=}')
+            # bot.send_message(userID,'Спасибо за ответ1ы, мы просчитаем Ваш проект и свяжемся с вами')
+            # sql.set_payload(userID, 'exit')
+            # # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+            # path = ''
+            # for answers in QUESTS_USERS[userID]:
+            #     typeQuest = f"{typeQuest}{COUNT_ZABOR_USER[userID][answers[0]]}"
+            #     path = send_values_in_sheet(typeQuest, answers, f'{username}_{QUESTS_USERS[userID][0][0]}',)   
+            #     COUNT_ZABOR_USER[userID][answers[0]]+1
+            #     #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username}_{QUESTS_USERS[userID][0]}',)   
+            # sheet.export_pdf(path)
+            # with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
+            #     bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
+            #     bot.send_document(userID, pdf_file)#filename='file.pdf')
+            # return 0
+            sql.set_payload(userID, 'quest_1') 
+            try:
+                COUNT_ZABOR_USER[userID]['real'] += 1  
+            except:
+                COUNT_ZABOR_USER.setdefault(userID, {'max':int(text),
+                                                    'real': 1,
+                                                    'profNastil': 1,
+                                                    'evroShtak':1})
+            numberZabor = COUNT_ZABOR_USER[userID]['real'] 
+            bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
+            return 0
+        
+        # if COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']+1: 
+        #         sql.set_payload(userID, 'quest_20') 
+        #         return 0
+
+        print(f"{COUNT_ZABOR_USER[userID]['real']=} {COUNT_ZABOR_USER[userID]['max']=}")
+        print(f'{int(quest)=} {len(listQuestions)=}')
+        
+        if int(quest) == len(listQuestions)+1 and COUNT_ZABOR_USER[userID]['real'] < COUNT_ZABOR_USER[userID]['max']:
+                sql.set_payload(userID, 'quest_0') 
+                return 0
+        elif int(quest) == len(listQuestions) and COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']:
             bot.send_message(userID,'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами')
             sql.set_payload(userID, 'exit')
             # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
-            path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+            path = ''
+            copyTable = True
+            for answers in QUESTS_USERS[userID]:
+                pprint(QUESTS_USERS[userID])
+                typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
+                print(f'{typeQuest1=}')
+                path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable)   
+                COUNT_ZABOR_USER[userID][answers[0]] += 1
+                copyTable = False
+                #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+            sheet = Sheet('GDtxt.json',path,get_worksheet=1)
+            sheet.export_pdf(path)
             with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
                 bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
                 bot.send_document(userID, pdf_file)#filename='file.pdf')
-            return 0
-        
-        sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
+        else:    
+            sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
+
         return 0 
 
 
