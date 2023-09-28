@@ -46,7 +46,7 @@ PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnp
 
 
 
-# CHECK_WORDS = sheet.get_words_and_urls()
+CHECK_WORDS = sheet.get_words_and_urls()
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
