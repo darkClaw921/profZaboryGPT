@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y nano vim redis-server
 WORKDIR /app
 
 # Копируем файлы helper.py, chat.py, workFlask.py и workBinance.py в директорию /app контейнера
-COPY chat.py helper.py index.py workBitrix.py workGDrive.py workGS.py workRedis.py workTelegram.py yandexDiskWork.py workYDB.py createKeyboard.py run.sh /app/
-
+# COPY chat.py helper.py index.py workBitrix.py workGDrive.py workGS.py workRedis.py workTelegram.py yandexDiskWork.py workYDB.py createKeyboard.py run.sh /app/
+COPY autogen1.py chat.py /app/
 # Копируем файл requirements.txt в директорию /app контейнера
 COPY requirements.txt /app/
 
@@ -24,10 +24,11 @@ COPY requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Открываем порт 5000 (или любой другой необходимый порт)
-EXPOSE 5002
+# EXPOSE 5002
 
 # Копируем файл .env внутрь контейнера
 COPY .env authorized_key-2.json GDtxt.json kgtaprojects-8706cc47a185.json /app/
-RUN chmod +x /app/run.sh
-CMD ["/app/run.sh"]
-#CMD ["python", "workFlask.py"]
+# RUN chmod +x /app/run.sh
+# CMD ["/app/run.sh"]
+# CMD ["python", "workFlask.py"]
+CMD ["python", "autogen1.py"]

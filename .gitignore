@@ -15,6 +15,11 @@ __pycache__/
 *.txt
 *.png
 *.jpeg
+work_dir/
+coding/
+*.mp3
+*.csv
+*.sh
 # Distribution / packaging
 bin/
 kgtaprojects-8706cc47a185.json
