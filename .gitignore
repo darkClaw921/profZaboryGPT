@@ -20,6 +20,8 @@ coding/
 *.mp3
 *.csv
 *.sh
+OAI_CONFIG_LIST
+autogen1.py
 # Distribution / packaging
 bin/
 kgtaprojects-8706cc47a185.json

@@ -2,9 +2,11 @@ from sipuni_api import Sipuni
 from yandexSpeach import *
 from dotenv import load_dotenv
 load_dotenv()
-# client = Sipuni('068578', '0.dj578vc0ce')
-client = Sipuni('068578', '0.9lh3w3znvkl')
-# client = Sipuni('0.dj578vc0ce','068578')
+
+client_id = os.environ.get('SIPUNU_CLIENT_ID')
+secret_id = os.environ.get('SIPUNU_SECRET_ID')
+client = Sipuni(client_id, secret_id)
+
 
 # call statistic
 # from datetime import datetime, timedelta

@@ -2,14 +2,12 @@ import urllib.request
 import json
 from pprint import pprint
 from loguru import logger
-
-#id = 'aje2b65oq08kpnf7c9li'
-#key = 'AQVNwlmLjQEUzd52JrKjIefA4mJA5sIgEJCEHmNh'
+from dotenv import load_dotenv
+load_dotenv
 @logger.catch
 def get_text_record(fileName:str):
     FOLDER_ID = "b1g83bovl5hjt7cl583v" # Идентификатор каталога
-    #IAM_TOKEN = "t1.9euelZrGzI_NkZGdzJCMmZaelMrGle3rnpWamZPNmo_Kx5bOjpqPlZySlczl8_cgRFBZ-e8jXHs4_d3z92ByTVn57yNcezj9zef1656VmpfIyc-amMmKlI2VyI6amJqM7_zF656VmpfIyc-amMmKlI2VyI6amJqM.nyIMo1qJVmHGHV5eVHbpVbqcdKHqo7Bl1c1KNU3gH-8a7Pdu7-2a8uwxogB21Qgl9xht8GQ9H1YM4wfZufNiCg" # IAM-токен
-    API_KEY = 'AQVNwlmLjQEUzd52JrKjIefA4mJA5sIgEJCEHmNh'
+    API_KEY = os.environ.get('API_KEY_YANDEX_SPEACH')
     # filePath = '/Users/igorgerasimov/Python/Bitrix/test-chatGPT/aa/record.ogg'
 
     # длинные аудио
