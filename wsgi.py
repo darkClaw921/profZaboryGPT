@@ -1,0 +1,2 @@
+from amocrm import app
+

@@ -12,63 +12,49 @@ tokens.default_token_manager(
 
     storage=tokens.FileTokensStorage(),  # by default FileTokensStorage
 )
-# tokens.default_token_manager.init(code="12", skip_error=True)
 tokens.default_token_manager.get_access_token()
-from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field, filters
+
+
+from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field, filters, interaction, Event
+# Event.
+a = interaction.BaseInteraction()
+row ={
+    'conversation_id':'12',
+    'source':{'external_id': '123'},
+    'user':{'id':'55', 'ref_id':'10167014','name':'testName',"profile": {
+            "phone": "79151112233",
+            "email": "example.client@example.com"
+        },}}
+row2= {
+    ''
+}
+b = a.request('/api/v4/leads','leads',)
+print(b)
+1/0
+
+
+
 class Lead(_Lead):
     record_text = custom_field.TextAreaCustomField("record text")
     # phone1 = custom_field.ContactPhoneField('phone')
 
 class Contact(_Contact):
-    phone1 = custom_field.ContactPhoneField('phone')
+    phone = custom_field.ContactPhoneField('phone')
     # dealID = custom_field('linked_leads')
 
 
-# lead = Lead.objects.filter(phone='',{'phone':'89308316687'})
-# filters.Filter('phone')('89308316687')
-# filter='phone:8908316655'
-# lead = Lead.objects.get(query='phone_number:89308316687')
-conta = Contact.objects.get(query='89308316687')
-# a = Contact._get_embedded_fields()
-# pprint(a)
-# pprint(conta.name)
-# pprint(conta.linked_leads)
-leadID = conta.leads._data[0]['id']
-lead = Lead.objects.get(f'{leadID}')
-# lead = Lead.objects.filter(filters=filters.Filter(Contact.phone1)('89308316687'))
-# lead = Lead.objects.filter(filters=(filters.MultiFilter('contacts')('custom_fields_values')('field_code')('PHONE')('values')('89308316687'),filters.MultiFilter('custom_fields_values')('field_code')))
-print(lead)
-# for l in lead:
-#     print(l)
-# print(lead[0])
+def update_lead(phone:str, text:str):
 
-lead.lead_card_budget=12448222
-lead.record_text = """Менеджер провел успешный разговор с клиентом, который интересуется установкой забора между соседями. Он предложил разные варианты и предоставил информацию о материалах и ценах.
+    # conta = Contact.objects.get(query='89308316687')
+    conta = Contact.objects.get(query=phone)
+    leadID = conta.leads._data[0]['id']
+    lead = Lead.objects.get(f'{leadID}')
+    # print(lead)
 
-Что было сделано хорошо:
+    # lead.lead_card_budget=12448222
+    # lead.record_text = """Менеджер провел успешный разговор с клиентом, который интересуется установкой забора между соседями. Он предложил разные варианты и предоставил информацию о материалах и ценах.
+    lead.record_text = text
+    lead.save()
 
-Менеджер вежливо и профессионально представил себя и компанию.
-
-Он внимательно выслушал потребности клиента и задал уточняющие вопросы.
-
-Менеджер предложил разные варианты забора и предоставил ценовые расчеты.
-
-Он уточнил местоположение участка и рассчитал стоимость с учетом доставки.
-
-Менеджер объяснил процесс замера и подготовки к установке.
-
-Он был готов скинуть расчеты и визитку компании через WhatsApp для дальнейшего обсуждения.
-
-Что можно улучшить:
-
-Менеджер мог бы уточнить у клиента его контактные данные (номер телефона) для более удобной связи и отправки информации.
-
-Необходимо следить за четкостью и точностью предоставляемой информации, чтобы избежать недоразумений.
-
-Менеджер мог бы предоставить более подробную информацию о сроках и гарантиях выполнения работ.
-
-В целом, менеджер продемонстрировал хорошее внимание к клиенту и его потребностям, а также готовность предоставить информацию для принятия решения."""
-lead.save()
-# print(a)
 
 
