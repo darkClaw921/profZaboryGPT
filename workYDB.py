@@ -24,10 +24,20 @@ def truncate_string(string, max_length):
         return string[:max_length]
     else:
         return string
-    
+
+
+intList = ['all_token', 'all_messages', 'time_epoh', 'token', 'stock_id','id'
+           ,'num_order','strategia','user_id','strateg','deal_id','strategia',
+           'leadID']
+
+floatList = ['token_price','amount','price_open',
+              'price_insert','price_close','need_price_close','bb_bu',
+              'rate_change', 'lower_price', 'upper_price','need_price_close','price_open',
+              'persent_ot_depo','depo', 'depo_deals','commission','cred_plecho','stop_loss']
+
+dateTimeList = ['date_time','date_close','need_data_close','date_open', 'date_open','deal_id'] 
 class Ydb:
     def replace_query(self, tableName: str, rows: dict):
-        #print('попали в инсерт')
         field_names = rows.keys()
         fields_format = ", ".join(field_names)
         my_list = list(rows.values())
@@ -39,19 +49,27 @@ class Ydb:
                 value1 = value1.replace('"',"'")    
             except:
                 1 + 0
-
-            value1 = truncate_string(str(value1), 2000)            
             
+            #TODO переделать под разные форматы
+            value1 = truncate_string(str(value1), 2000)            
             if key == 'id':
                 value += f'{value1},'
+
+            elif key in intList:
+                value += f'{int(value1)},'
+            
+            elif key in floatList:
+                value += f'{float(value1)},'
+            
+            elif key in dateTimeList:
+                value += f'CAST("{value1}" AS datetime ),'
             else:
                 value += f'"{value1}",'
             
         value = value[:-1] + ')'
         # values_placeholder_format = ', '.join(my_list)
-        query = f"REPLACE INTO {tableName} ({fields_format}) VALUES {value}"
+        query = f"REPLACE INTO `{tableName}` ({fields_format}) VALUES {value}"
         print(query)
-
         def a(session):
             session.transaction(ydb.SerializableReadWrite()).execute(
             #session(ydb.SerializableReadWrite()).execute(
@@ -204,7 +222,7 @@ class Ydb:
         return context
     
     def set_payload(self, userID: int, entity:str):
-        query = f'UPDATE user SET payload = "{entity}" WHERE id = {userID}'
+        query = f'UPDATE SaleBot SET payload = "{entity}" WHERE id = {userID}'
         #print(query)
         def a(session):
             session.transaction(ydb.SerializableReadWrite()).execute(
@@ -212,29 +230,10 @@ class Ydb:
                 commit_tx=True,
             )
         return pool.retry_operation_sync(a)
-    
-    def set_promt(self, userID: int, entity:str):
-        query = f'UPDATE user SET promt = "{entity}" WHERE id = {userID}'
-        #print(query)
-        def a(session):
-            session.transaction(ydb.SerializableReadWrite()).execute(
-                query,
-                commit_tx=True,
-            )
-        return pool.retry_operation_sync(a)
-    
-    def set_promt(self, userID: int, entity:str):
-        query = f'UPDATE user SET promt = "{entity}" WHERE id = {userID}'
-        #print(query)
-        def a(session):
-            session.transaction(ydb.SerializableReadWrite()).execute(
-                query,
-                commit_tx=True,
-            )
-        return pool.retry_operation_sync(a)
+
 
     def get_payload(self, whereID: int):
-        query = f'SELECT payload FROM user WHERE id = {whereID}'
+        query = f'SELECT payload FROM SaleBot WHERE id = {whereID}'
         print(query)
 
         def a(session):
@@ -243,33 +242,23 @@ class Ydb:
                 commit_tx=True,
             )
         b = pool.retry_operation_sync(a)
-        rez = b[0].rows[0]['payload'].decode('utf-8')
+        rez = b[0].rows[0]['payload']
         return rez
     
-    def get_promt(self, whereID: int):
-        query = f'SELECT promt FROM user WHERE id = {whereID}'
+    def get_leadID(self, whereID: int):
+        query = f'SELECT leadID FROM SaleBot WHERE id = {whereID}'
         print(query)
-        def a(session):
-            return session.transaction().execute(
-                query,
-                commit_tx=True,
-            )
-        b = pool.retry_operation_sync(a)
-        rez = b[0].rows[0]['payload'].decode('utf-8')
-        return rez
- 
-    def get_model(self, whereID: int):
-        query = f'SELECT model FROM user WHERE id = {whereID}'
-        print(query)
-        def a(session):
-            return session.transaction().execute(
-                query,
-                commit_tx=True,
-            )
-        b = pool.retry_operation_sync(a)
-        rez = b[0].rows[0]['payload'].decode('utf-8')
-        return rez
 
+        def a(session):
+            return session.transaction().execute(
+                query,
+                commit_tx=True,
+            )
+        b = pool.retry_operation_sync(a)
+        rez = b[0].rows[0]['leadID']
+        return rez
+    
+    
     def select_query(self,tableName: str, where: str):
         # 'where id > 20 '
         query = f'SELECT * FROM {tableName} WHERE {where}'

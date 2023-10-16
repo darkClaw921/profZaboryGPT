@@ -9,9 +9,9 @@ client = Sipuni(client_id, secret_id)
 
 
 # call statistic
-# from datetime import datetime, timedelta
-# a = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=datetime.now())   # return csv data
-# print(a)
+from datetime import datetime, timedelta
+a = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=datetime.now())   # return csv data
+print(a)
 
 # import csv
 

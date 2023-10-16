@@ -17,25 +17,26 @@ tokens.default_token_manager.get_access_token()
 
 from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field, filters, interaction, Event
 # Event.
-a = interaction.BaseInteraction()
-row ={
-    'conversation_id':'12',
-    'source':{'external_id': '123'},
-    'user':{'id':'55', 'ref_id':'10167014','name':'testName',"profile": {
-            "phone": "79151112233",
-            "email": "example.client@example.com"
-        },}}
-row2= {
-    ''
-}
-b = a.request('/api/v4/leads','leads',)
-print(b)
-1/0
+# a = interaction.BaseInteraction()
+# row ={
+#     'conversation_id':'12',
+#     'source':{'external_id': '123'},
+#     'user':{'id':'55', 'ref_id':'10167014','name':'testName',"profile": {
+#             "phone": "79151112233",
+#             "email": "example.client@example.com"
+#         },}}
+# row2= {
+#     ''
+# }
+# b = a.request('/api/v4/leads','leads',)
+# print(b)
+# 1/0
 
 
 
 class Lead(_Lead):
     record_text = custom_field.TextAreaCustomField("record text")
+    noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
     # phone1 = custom_field.ContactPhoneField('phone')
 
 class Contact(_Contact):
@@ -56,5 +57,19 @@ def update_lead(phone:str, text:str):
     lead.record_text = text
     lead.save()
 
+def check_need_answered_for(leadID:int):
+    lead = Lead.objects.get(f'{leadID}')
+    if lead.noAnswerBot is None:
+        return True 
+    else:
+        return False
 
 
+
+
+if __name__ ==  '__main__':
+    # update_lead('640073', 'test text2')
+    a = check_need_answered_for(leadID=435263)
+    print(a)
+    # lead.record_text = 'text'
+    # lead.save()
