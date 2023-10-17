@@ -125,7 +125,7 @@ def any_message(userID,message):
     # logger.debug(f'{data=}') 
     
     
-    return 'test text'
+    return {'asd':'test text'}
 
     #print('это сообщение', message)
     #text = message.text.lower()

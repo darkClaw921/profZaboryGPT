@@ -12,6 +12,7 @@ tokens.default_token_manager(
 
     storage=tokens.FileTokensStorage(),  # by default FileTokensStorage
 )
+
 tokens.default_token_manager.get_access_token()
 
 
