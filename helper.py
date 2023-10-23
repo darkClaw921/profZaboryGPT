@@ -83,8 +83,11 @@ def create_media_gorup(lst:list):
         
     return media_group
 
-
-
+def prepare_dict_keyboadr(dic)->str:
+    st = ''
+    for key, value in dic.items():
+        st += f'{key}. {value}\n'
+    return st
 
         
 #Google Sheet

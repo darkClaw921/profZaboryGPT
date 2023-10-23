@@ -10,6 +10,7 @@ import json
 from loguru import logger
 import sys
 from createKeyboard import *
+from createKeyboard import *
 from workBitrix import *
 from helper import *
 from workGDrive import *
@@ -17,6 +18,7 @@ from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
 from questions import *
+from questionsNoKeyboard import *
 from flask import Flask, request, render_template
 from amocrmWork import *
 load_dotenv()
@@ -36,6 +38,8 @@ TYPE_QUESTIONS = {'profNastil': questionProfNastil,
 URL_USERS = {}
 QUESTS_USERS = {}
 COUNT_ZABOR_USER={}
+ALL_QUESTS_USERS ={}
+SECTION_QUESTS_USERS ={}
 # MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 # #gsText, urls_photo = sheet.get_gs_text()
 # #print(f'{urls_photo=}')
@@ -125,7 +129,7 @@ def any_message(userID,message):
     # logger.debug(f'{data=}') 
     
     
-    return {'asd':'test text'}
+    # return {'asd':'test text'}
 
     #print('это сообщение', message)
     #text = message.text.lower()
@@ -135,14 +139,28 @@ def any_message(userID,message):
     username = userID
     payload = sql.get_payload(userID)
     
-
-    if text == 'calc':
+    #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 
+    if text == 'calc': 
+        text = "Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)"
+        # bot.send_message(userID,'Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)',)
         sql.set_payload(userID, 'quest_0')
-        bot.send_message(userID,'Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)',)
-        return 0
-    
+        ALL_QUESTS_USERS[userID]={
+            'profNastil':[],
+            'evroShtak':[],
+        }
+        return {'asd':text}
+
+    #Выбор продолжить или нет добавлять новые секции
+    if payload == 'select':
+        if text == 1: #ДА
+            sql.set_payload(userID,'quest_0')
+        elif text == 2:#НЕТ
+            sql.set_payload(userID,'exit')
+        #TODO добавить тип секции который мы заполняли
+        ALL_QUESTS_USERS[userID][type].append(SECTION_QUESTS_USERS[userID])
+
     if payload == 'quest_0':
-        sql.set_payload(userID, 'quest_1') 
+        
         try:
             COUNT_ZABOR_USER[userID]['real'] += 1  
         except:
@@ -151,9 +169,49 @@ def any_message(userID,message):
                                                  'profNastil': 1,
                                                  'evroShtak':1})
         numberZabor = COUNT_ZABOR_USER[userID]['real'] 
-        bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
-        return 0
-    
+        textSendMessage = f'Из какого материала будет секция?\n'
+        keyboardText = questionTypeMaterial
+        keyboardText = prepare_dict_keyboadr(keyboardText)
+        textSendMessage += keyboardText
+
+        SECTION_QUESTS_USERS[userID] = []
+        sql.set_payload(userID, 'quest_1') 
+        # bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
+        
+        return {'asd':textSendMessage}
+
+
+    if payload.startswith('quest'):
+        numberQuest = int(payload.split('_')[1])
+        
+        if payload == 'quest_1':
+            typeQuest = questionTypeMaterial[int(text)]
+        else:
+            typeQuest = payload.split('_')[2] 
+
+        listQuestions = TYPE_QUESTIONS[typeQuest]
+        
+        if numberQuest == len(listQuestions):
+            textSendMessage = 'Хотите выбрать еще секцию?\n1. Да\n2. Нет'
+            sql.set_payload(userID,'select')
+            return {'asd':textSendMessage}
+        
+        textAnsewer = text if listQuestions[numberQuest]['keyboard'] in None else listQuestions[numberQuest]['keyboard'][int(text)] 
+        SECTION_QUESTS_USERS[userID].append(textAnsewer)
+        logger.debug(f'Ответ на {numberQuest} вопрос {textAnsewer} для {typeQuest}')
+
+         
+        if listQuestions[numberQuest]['keyboard'] in None: 
+            textSendMessage = listQuestions[numberQuest]['text']
+        else:
+            keyboard = prepare_dict_keyboadr(listQuestions[numberQuest]['keyboard'])
+            textSendMessage = listQuestions[numberQuest]['text'] + keyboard  
+
+        payload = f'quest_{int(numberQuest)+1}'
+        sql.set_payload(userID,payload)
+        return {'asd':textSendMessage}
+
+    #TODO выбросить
     if payload.startswith('quest'):
         QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(text)
         quest = payload.split('_')[1]
@@ -162,24 +220,13 @@ def any_message(userID,message):
         typeQuest = payload.split('_')[2]
         listQuestions = TYPE_QUESTIONS[typeQuest]
         try:
+            #TODO 
+            #добавить клавиатуру как текст с кнопками 
+            textMessage = listQuestions[quest]['text'] 
+            keyboard = listQuestions[quest]['keyboard'] 
             bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard']) 
         except Exception as e:
 
-            # logger.debug(f'{e=}')
-            # bot.send_message(userID,'Спасибо за ответ1ы, мы просчитаем Ваш проект и свяжемся с вами')
-            # sql.set_payload(userID, 'exit')
-            # # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
-            # path = ''
-            # for answers in QUESTS_USERS[userID]:
-            #     typeQuest = f"{typeQuest}{COUNT_ZABOR_USER[userID][answers[0]]}"
-            #     path = send_values_in_sheet(typeQuest, answers, f'{username}_{QUESTS_USERS[userID][0][0]}',)   
-            #     COUNT_ZABOR_USER[userID][answers[0]]+1
-            #     #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username}_{QUESTS_USERS[userID][0]}',)   
-            # sheet.export_pdf(path)
-            # with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
-            #     bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
-            #     bot.send_document(userID, pdf_file)#filename='file.pdf')
-            # return 0
             sql.set_payload(userID, 'quest_1') 
             try:
                 COUNT_ZABOR_USER[userID]['real'] += 1  
@@ -205,7 +252,8 @@ def any_message(userID,message):
         elif int(quest) == len(listQuestions) and COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']:
             bot.send_message(userID,'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами')
             sql.set_payload(userID, 'exit')
-            # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+            bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+            
             path = ''
             copyTable = True
             for answers in QUESTS_USERS[userID]:
