@@ -159,10 +159,10 @@ def any_message(userID,message):
         text = "Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)"
         # bot.send_message(userID,'Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)',)
         sql.set_payload(userID, 'quest_0')
-        ALL_QUESTS_USERS[userID]={
-            'profNastil':[],
-            'evroShtak':[],
-        }
+        # ALL_QUESTS_USERS[userID]={
+        #     'profNastil':[],
+        #     'evroShtak':[],
+        # }
         return {'asd':text}
 
     #Выбор продолжить или нет добавлять новые секции
@@ -211,12 +211,12 @@ def any_message(userID,message):
             sql.set_payload(userID,'select')
             return {'asd':textSendMessage}
         
-        textAnsewer = text if listQuestions[numberQuest]['keyboard'] in None else listQuestions[numberQuest]['keyboard'][int(text)] 
+        textAnsewer = text if listQuestions[numberQuest]['keyboard'] is None else listQuestions[numberQuest]['keyboard'][int(text)] 
         SECTION_QUESTS_USERS[userID].append(textAnsewer)
         logger.debug(f'Ответ на {numberQuest} вопрос {textAnsewer} для {typeQuest}')
 
          
-        if listQuestions[numberQuest]['keyboard'] in None: 
+        if listQuestions[numberQuest]['keyboard'] is None: 
             textSendMessage = listQuestions[numberQuest]['text']
         else:
             keyboard = prepare_dict_keyboadr(listQuestions[numberQuest]['keyboard'])
