@@ -37,8 +37,10 @@ logger.add("file_1.log", rotation="50 MB")
 # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
-TYPE_QUESTIONS = {'profNastil': questionProfNastil,
-                  'evroShtak':questionEvroShtak} 
+# TYPE_QUESTIONS = {'profNastil': questionProfNastil,
+#                   'evroShtak':questionEvroShtak} 
+TYPE_QUESTIONS = {'Профнастил': questionProfNastil,
+                  'Евроштакетник':questionEvroShtak} 
 URL_USERS = {}
 QUESTS_USERS = {}
 COUNT_ZABOR_USER={}
@@ -121,6 +123,7 @@ def get_leadID_from(string:str)-> int:
             return int(row.split(' ')[1])
         
 @app.route('/<int:userID>/<string:message>')
+@logger.catch
 def any_message(userID,message):
     global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER
     print('da')
