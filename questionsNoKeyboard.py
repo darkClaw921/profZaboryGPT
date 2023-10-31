@@ -48,6 +48,9 @@ questionProfNastil = {
 
     7: {'text': 'Расстояние от МКАД',
         'keyboard': None},
+        #пустой закрывающий влпрос 
+    8: {'text': 'Расстояние от МКАД',
+        'keyboard': None},
 }
 
 questionEvroShtak = {
@@ -90,8 +93,16 @@ questionEvroShtak = {
 
     7: {'text': 'Расстояние от МКАД',
         'keyboard': None},
+    #пустой закрывающий влпрос 
+    8: {'text': 'Расстояние от МКАД',
+        'keyboard': None},
 }
 questionTypeMaterial = {
     1: 'Профнастил',
     2: 'Евроштакетник',
+}
+
+questionTypeMaterialEN = {
+    1: 'profNastil',
+    2: 'evroShtak',
 }

@@ -37,10 +37,10 @@ logger.add("file_1.log", rotation="50 MB")
 # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
-# TYPE_QUESTIONS = {'profNastil': questionProfNastil,
-#                   'evroShtak':questionEvroShtak} 
-TYPE_QUESTIONS = {'Профнастил': questionProfNastil,
-                  'Евроштакетник':questionEvroShtak} 
+TYPE_QUESTIONS = {'profNastil': questionProfNastil,
+                  'evroShtak':questionEvroShtak} 
+# TYPE_QUESTIONS = {'Профнастил': questionProfNastil,
+#                   'Евроштакетник':questionEvroShtak} 
 URL_USERS = {}
 QUESTS_USERS = {}
 COUNT_ZABOR_USER={}
@@ -64,14 +64,16 @@ SECTION_QUESTS_USERS ={}
 # @bot.message_handler(commands=['help', 'start'])
 @app.route('/reg/<int:userID>/<string:message>')
 def say_welcome(userID, message):
-    leadID = get_leadID_from(string=message)
+
+    #TODO
+    # leadID = get_leadID_from(string=message)
+    # row = {'id': userID,  'payload': '', 'leadID':leadID}
     
-    
-    row = {'id': userID,  'payload': '', 'leadID':leadID}
+    row = {'id': userID,  'payload': '', 'leadID':1}
     sql.replace_query('SaleBot', row)
     
     text = """Здравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
-    return text
+    return {'abs':text}
 #expert_promt = gpt.load_prompt('https://docs.google.com/document/d/181Q-jJpSpV0PGnGnx45zQTHlHSQxXvkpuqlKmVlHDvU/')
 
 
@@ -126,7 +128,7 @@ def get_leadID_from(string:str)-> int:
 @logger.catch
 def any_message(userID,message):
     global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER
-    print('da')
+    # print('da')
 
     
     
@@ -152,7 +154,11 @@ def any_message(userID,message):
     userID= userID
    
     username = userID
+    # try: 
     payload = sql.get_payload(userID)
+    # except:
+    #     say_welcome
+
     
     #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 
     if text == 'calc': 
@@ -163,6 +169,7 @@ def any_message(userID,message):
         #     'profNastil':[],
         #     'evroShtak':[],
         # }
+        QUESTS_USERS[userID]=[] 
         return {'asd':text}
 
     #Выбор продолжить или нет добавлять новые секции
@@ -170,10 +177,14 @@ def any_message(userID,message):
         if text == 1: #ДА
             sql.set_payload(userID,'quest_0')
         elif text == 2:#НЕТ
-            sql.set_payload(userID,'exit')
-        #TODO добавить тип секции который мы заполняли
-        ALL_QUESTS_USERS[userID][type].append(SECTION_QUESTS_USERS[userID])
-
+            # sql.set_payload(userID,'exit')
+            sql.set_payload(userID,'generate')
+        payload = 'generate'
+        
+        # typeMaterial =questionTypeMaterialEN[int(SECTION_QUESTS_USERS[userID][0])]
+        typeMaterial =SECTION_QUESTS_USERS[userID][0][:-1]
+        # ALL_QUESTS_USERS[userID][typeMaterial].append(SECTION_QUESTS_USERS[userID])
+        QUESTS_USERS[userID].append(SECTION_QUESTS_USERS[userID])
     if payload == 'quest_0':
         
         try:
@@ -199,10 +210,14 @@ def any_message(userID,message):
     if payload.startswith('quest'):
         numberQuest = int(payload.split('_')[1])
         
+        logger.debug(f'{payload}')
         if payload == 'quest_1':
-            typeQuest = questionTypeMaterial[int(text)]
+            typeQuest = questionTypeMaterialEN[int(text)]
+            typeMaterialQuest = questionTypeMaterial[int(text)]
+             
         else:
             typeQuest = payload.split('_')[2] 
+            # typeMaterialQuest = payload.split('_')[2] 
 
         listQuestions = TYPE_QUESTIONS[typeQuest]
         
@@ -210,9 +225,21 @@ def any_message(userID,message):
             textSendMessage = 'Хотите выбрать еще секцию?\n1. Да\n2. Нет'
             sql.set_payload(userID,'select')
             return {'asd':textSendMessage}
-        
-        textAnsewer = text if listQuestions[numberQuest]['keyboard'] is None else listQuestions[numberQuest]['keyboard'][int(text)] 
-        SECTION_QUESTS_USERS[userID].append(textAnsewer)
+        try:
+            textAnsewer = text if listQuestions[numberQuest]['keyboard'] is None else listQuestions[numberQuest]['keyboard'][int(text)] 
+        except:
+            textAnsewer = text 
+
+        if payload != 'quest_1':
+            SECTION_QUESTS_USERS[userID].append(textAnsewer)
+        else:
+            #Евроштакетник
+            typeMaterial = questionTypeMaterialEN[int(text)]
+            # SECTION_QUESTS_USERS[userID].append(questionTypeMaterialEN[int(text)]+ )
+            SECTION_QUESTS_USERS[userID].append(typeMaterial+f"{COUNT_ZABOR_USER[userID][typeMaterial]}")
+            SECTION_QUESTS_USERS[userID].append(textAnsewer)
+            # SECTION_QUESTS_USERS[userID].append(int(text))
+    
         logger.debug(f'Ответ на {numberQuest} вопрос {textAnsewer} для {typeQuest}')
 
          
@@ -221,10 +248,55 @@ def any_message(userID,message):
         else:
             keyboard = prepare_dict_keyboadr(listQuestions[numberQuest]['keyboard'])
             textSendMessage = listQuestions[numberQuest]['text'] + keyboard  
+        logger.debug(f'Ответ на {numberQuest} {textSendMessage} вопрос {textAnsewer} для {typeQuest}')
 
-        payload = f'quest_{int(numberQuest)+1}'
+        payload = f'quest_{int(numberQuest)+1}_{typeQuest}'
         sql.set_payload(userID,payload)
         return {'asd':textSendMessage}
+
+    if payload.startswith('generate'):
+        print(f"{COUNT_ZABOR_USER[userID]['real']=} {COUNT_ZABOR_USER[userID]['max']=}")
+        # print(f'{int(quest)=} {len(listQuestions)=}')
+        
+        # if int(quest) == len(listQuestions)+1 and COUNT_ZABOR_USER[userID]['real'] < COUNT_ZABOR_USER[userID]['max']:
+        #         sql.set_payload(userID, 'quest_0') 
+        #         return 0
+        # elif int(quest) == len(listQuestions) and COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']:
+            
+        sql.set_payload(userID, 'exit')
+        # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+        
+        path = ''
+        copyTable = True
+        # for answers in QUESTS_USERS[userID]:
+        print(f'{QUESTS_USERS=}') 
+        for answers in QUESTS_USERS[userID]:
+            pprint(QUESTS_USERS[userID])
+            # answersOneSection = answersAll[answersAll]
+            # for answers in answersOneSection:
+
+            print(f'{answers=}')
+            print(f'{COUNT_ZABOR_USER[userID]=}')
+            # print(f'{COUNT_ZABOR_USER[userID][answers[0]]=}')
+            # typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]][:-1]}"
+            typeQuest1 = answers[0]
+            print(f'{typeQuest1=}')
+            # path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable)   
+            path = send_values_in_sheet(typeQuest1, answers, f'{username}_{typeQuest1}', first=copyTable)   
+            # COUNT_ZABOR_USER[userID][answers[0]] += 1
+            copyTable = False
+            #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+        sheet = Sheet('GDtxt.json',path,get_worksheet=1)
+        url = sheet.export_pdf(path)
+        #отправка файла
+        # with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
+        #     bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
+        #     bot.send_document(userID, pdf_file)#filename='file.pdf')
+        # else:    
+        #     sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
+        textAnsewer = f'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами \n\n вот предворительный расчет {url}'
+        return {'asd':textAnsewer}
+
 
     #TODO выбросить
     if payload.startswith('quest'):
@@ -421,5 +493,9 @@ def any_message(userID,message):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5004')    
+    # mesList = ['calc','2','1','2','3','4','5','6','7','8','9']
+    # # mesList = ['calc','1','2','3','4','5','6','7','8','9','10']
+    # for i in mesList:
+    #     any_message(1,i)
     # print(f'[OK]')
     # bot.infinity_polling()

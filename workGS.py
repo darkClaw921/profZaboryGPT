@@ -95,6 +95,7 @@ class Sheet():
         res = requests.get(url, headers=headers)
         with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
             f.write(res.content)
+        return url
 
 @dataclass
 class table:
