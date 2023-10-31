@@ -20,7 +20,11 @@ import workGS
 from questions import *
 from questionsNoKeyboard import *
 from flask import Flask, request, render_template
-from amocrmWork import *
+
+#TODO
+# from amocrmWork import *
+
+
 load_dotenv()
 app = Flask(__name__)
 isDEBUG = True
@@ -120,13 +124,21 @@ def get_leadID_from(string:str)-> int:
 def any_message(userID,message):
     global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER
     print('da')
-    leadID = sql.get_leadID(userID)
-    if leadID is not None:
-        isSendAnswer = check_need_answered_for(leadID=leadID)
-        logger.debug(f'{isSendAnswer=}')
-        logger.debug(f'{leadID=}')
+
+    
+    
+    #TODO
+    # leadID = sql.get_leadID(userID)
+    # if leadID is not None:
+    #     isSendAnswer = check_need_answered_for(leadID=leadID)
+    #     logger.debug(f'{isSendAnswer=}')
+    #     logger.debug(f'{leadID=}')
+    
+    
     # data = request.get_json() 
     # logger.debug(f'{data=}') 
+    
+
     
     
     # return {'asd':'test text'}
