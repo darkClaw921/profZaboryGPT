@@ -144,7 +144,7 @@ def any_message(userID,message):
     # return {'asd':'test text'}
 
     #print('это сообщение', message)
-    #text = message.text.lower()
+    text = message.text.lower()
     text = text
     userID= userID
    
