@@ -40,6 +40,11 @@ class Sheet():
             # value_input_option='USER_ENTERED')
             self.sheet.update(cell, value, value_input_option='USER_ENTERED')
 
+    def insert_cell(self,data:list):
+        """Записывает в последнуюю пустую строку"""
+        nextRow = len(self.sheet.get_all_values()) + 1
+        self.sheet.insert_row(data,nextRow)
+
     def get_cell(self, i, n):
         value = self.sheet.cell(i, n).value
         return value

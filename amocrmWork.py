@@ -7,14 +7,15 @@ load_dotenv()
 tokens.default_token_manager(
     client_id = os.environ.get('client_id_amocrm'),
     client_secret = os.environ.get('client_secret_amocrm'),
-    subdomain = "darkclaw921",
+    # subdomain = "darkclaw921",
+    subdomain = "profzabor",
     redirect_url = "https://functions.yandexcloud.net/d4e4rh9tdbt4igqcj37q",
 
     storage=tokens.FileTokensStorage(),  # by default FileTokensStorage
 )
 
 tokens.default_token_manager.get_access_token()
-
+# tokens.default_token_manager.init(code="", skip_error=True)
 
 from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field, filters, interaction, Event
 # Event.
@@ -43,6 +44,12 @@ class Lead(_Lead):
 class Contact(_Contact):
     phone = custom_field.ContactPhoneField('phone')
     # dealID = custom_field('linked_leads')
+
+def get_leadID_from_contact(phone:str):
+    conta = Contact.objects.get(query=phone)
+    leadID = conta.leads._data[0]['id']
+    return leadID
+    # lead = Lead.objects.get(f'{leadID}')
 
 
 def update_lead(phone:str, text:str):

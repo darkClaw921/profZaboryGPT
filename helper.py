@@ -8,7 +8,14 @@ from workGS import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 from questions import pokrytie, porydok
+import uuid
+import speech_recognition as sr
+language='ru_RU'
+r = sr.Recognizer()
+
+
 # any
+
 def time_epoch():
     from time import mktime
     dt = datetime.now()
@@ -285,6 +292,38 @@ def summary(userID, error, isDEBUG):
     bot.send_message(message.chat.id, answer)
     add_message_to_history(userID, 'assistant', answer)
 
+
+r = sr.Recognizer()
+
+def recognise(filename):
+    with sr.AudioFile(filename) as source:
+        audio_text = r.listen(source)
+        try:
+            text = r.recognize_google(audio_text,language=language)
+            print('Converting audio transcripts into text ...')
+            print(text)
+            return text
+        except:
+            print('Sorry.. run again...')
+            return "Sorry.. run again..."
+
+
+def voice_processing(filename:str, response):
+    filename = str(uuid.uuid4())
+    file_name_full="voice/"+filename+".ogg"
+    file_name_full_converted="ready/"+filename+".wav"
+    # file_info = bot.get_file(message.voice.file_id)
+    # downloaded_file = bot.download_file(file_info.file_path)
+    # with open(file_name_full, 'wb') as new_file:
+        # new_file.write(downloaded_file)
+    with open(file_name_full, "wb") as file:
+        file.write(response.content)
+    os.system("ffmpeg -i "+file_name_full+"  "+file_name_full_converted)
+    text=recognise(file_name_full_converted)
+    # bot.reply_to(message, text)
+    os.remove(file_name_full)
+    os.remove(file_name_full_converted)
+    return text
 
 if __name__ == '__main__':
 #     data = [{'url': 'https://drive.google.com/drive/folders/18MGvuit-R5PJFyJ902M_DpyQTC6VFzCH',

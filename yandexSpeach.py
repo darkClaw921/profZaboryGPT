@@ -60,14 +60,14 @@ def get_text_record(fileName:str):
     # print(json.dumps(req, ensure_ascii=False, indent=2))
 
     # Показать только текст из результатов распознавания.
-    print("Text chunks:")
-    pprint(req)
+    # print("Text chunks:")
+    # pprint(req)
     fullText=''
     for chunk in req['response']['chunks']:
         # print(chunk['alternatives'][0]['text'])
         # fullText =+ chunk['alternatives'][0]['text']
         fullText1 = chunk['alternatives'][0]['text']
-        print(fullText1)
+        # print(fullText1)
         fullText+= fullText1+'\n'
     
     return fullText
