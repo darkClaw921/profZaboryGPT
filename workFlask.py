@@ -11,7 +11,7 @@ from loguru import logger
 import sys
 from createKeyboard import *
 from createKeyboard import *
-from workBitrix import *
+
 from helper import *
 from workGDrive import *
 from telebot.types import InputMediaPhoto
