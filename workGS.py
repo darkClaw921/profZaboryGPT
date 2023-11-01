@@ -93,8 +93,8 @@ class Sheet():
         print(f'{url=}')
         headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
         res = requests.get(url, headers=headers)
-        with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
-            f.write(res.content)
+        # with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
+        #     f.write(res.content)
         return url
 
 @dataclass
