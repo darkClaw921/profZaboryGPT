@@ -174,9 +174,9 @@ def any_message(userID,message):
 
     #Выбор продолжить или нет добавлять новые секции
     if payload == 'select':
-        if text == 1: #ДА
+        if text == '1': #ДА
             sql.set_payload(userID,'quest_0')
-        elif text == 2:#НЕТ
+        elif text == '2':#НЕТ
             # sql.set_payload(userID,'exit')
             sql.set_payload(userID,'generate')
         payload = 'generate'
@@ -185,6 +185,7 @@ def any_message(userID,message):
         typeMaterial =SECTION_QUESTS_USERS[userID][0][:-1]
         # ALL_QUESTS_USERS[userID][typeMaterial].append(SECTION_QUESTS_USERS[userID])
         QUESTS_USERS[userID].append(SECTION_QUESTS_USERS[userID])
+    
     if payload == 'quest_0':
         
         try:
@@ -288,6 +289,7 @@ def any_message(userID,message):
             # COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+        
         sheet = Sheet('GDtxt.json',path,get_worksheet=1)
         url = sheet.export_pdf(path)
         #отправка файла
