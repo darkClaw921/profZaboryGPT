@@ -159,6 +159,7 @@ def any_message(userID,message):
     except:
         say_welcome(1,2)
         payload = ''
+        text = 'calc'
 
     
     #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 
