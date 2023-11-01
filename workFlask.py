@@ -131,7 +131,7 @@ def any_message(userID,message):
     # print('da')
 
     
-    
+    textSendMessage = 'Пустое сообщение'
     #TODO
     # leadID = sql.get_leadID(userID)
     # if leadID is not None:
