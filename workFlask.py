@@ -154,10 +154,10 @@ def any_message(userID,message):
     userID= userID
    
     username = userID
-    # try: 
-    payload = sql.get_payload(userID)
-    # except:
-    #     say_welcome
+    try: 
+        payload = sql.get_payload(userID)
+    except:
+        say_welcome(1,2)
 
     
     #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 
