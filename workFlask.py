@@ -158,6 +158,7 @@ def any_message(userID,message):
         payload = sql.get_payload(userID)
     except:
         say_welcome(1,2)
+        payload = ''
 
     
     #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 
