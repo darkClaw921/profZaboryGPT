@@ -224,6 +224,7 @@ def any_message(userID,message):
         if numberQuest == len(listQuestions):
             textSendMessage = 'Хотите выбрать еще секцию?\n1. Да\n2. Нет'
             sql.set_payload(userID,'select')
+            logger.critical('запрос на выборку секции')
             return {'asd':textSendMessage}
         try:
             textAnsewer = text if listQuestions[numberQuest]['keyboard'] is None else listQuestions[numberQuest]['keyboard'][int(text)] 
@@ -255,7 +256,7 @@ def any_message(userID,message):
         return {'asd':textSendMessage}
 
     if payload.startswith('generate'): 
-        
+
         print(f"{COUNT_ZABOR_USER[userID]['real']=} {COUNT_ZABOR_USER[userID]['max']=}")
         # print(f'{int(quest)=} {len(listQuestions)=}')
         
