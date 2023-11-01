@@ -254,7 +254,8 @@ def any_message(userID,message):
         sql.set_payload(userID,payload)
         return {'asd':textSendMessage}
 
-    if payload.startswith('generate'):
+    if payload.startswith('generate'): 
+        
         print(f"{COUNT_ZABOR_USER[userID]['real']=} {COUNT_ZABOR_USER[userID]['max']=}")
         # print(f'{int(quest)=} {len(listQuestions)=}')
         
