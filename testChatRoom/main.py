@@ -4,8 +4,8 @@ import random
 from pprint import pprint
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "supersecretkey"
-app.config['SERVER_CERT'] = 'cert.pem'
-app.config['SERVER_KEY'] = 'key.pem'
+# app.config['SERVER_CERT'] = 'cert.pem'
+# app.config['SERVER_KEY'] = 'key.pem'
 socketio = SocketIO(app)
 
 # A mock database to persist data
@@ -101,6 +101,6 @@ def handle_disconnect():
         "sender": ""
     }, to=room)
 if __name__ == "__main__":
-    # socketio.run(app, host='0.0.0.0', port='5004', debug=False)
-    socketio.run(app, host='0.0.0.0', ssl_context=('cert.pem','key.pem'),port='5004', debug=False)
+    socketio.run(app, host='0.0.0.0', port='5004', debug=False)
+    # socketio.run(app, host='0.0.0.0', ssl_context=('cert.pem','key.pem'),port='5004', debug=False)
     
