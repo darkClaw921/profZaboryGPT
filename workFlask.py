@@ -20,11 +20,12 @@ import workGS
 from questions import *
 from questionsNoKeyboard import *
 from flask import Flask, request, render_template
+import requests
 
 #TODO
 # from amocrmWork import *
 
-
+CHAT_ROOM_URL = 'http://127.0.0.1:5004'
 load_dotenv()
 app = Flask(__name__)
 isDEBUG = True
@@ -68,7 +69,8 @@ def say_welcome(userID, message):
     #TODO
     # leadID = get_leadID_from(string=message)
     # row = {'id': userID,  'payload': '', 'leadID':leadID}
-    
+    a = requests.post(f'{CHAT_ROOM_URL}/create/room/{userID}')
+    logger.debug(a)
     row = {'id': userID,  'payload': '', 'leadID':1}
     sql.replace_query('SaleBot', row)
     
@@ -152,14 +154,17 @@ def any_message(userID,message):
     # text = message.text.lower()
     text = message
     userID= userID
-   
+    
+    requests.post(f'{CHAT_ROOM_URL}/message/{userID}/{text}')
+
     username = userID
     try: 
         payload = sql.get_payload(userID)
     except:
-        say_welcome(1,2)
+        say_welcome(userID=userID,message=text)
         payload = ''
         text = 'calc'
+
 
     
     #TODO добавить в конец вопрос хотите добавить еще секцию? и нет спасибо 

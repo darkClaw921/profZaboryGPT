@@ -11,12 +11,12 @@ pokrytie = {'odnostoronee':'Одностороннее',
 porydok = {'normal':'Обычный', 
         'chees':'Шахматный',
     }
-
+LAST_QUESTION = 'Это конец вопросов секции'
 questionProfNastil = {
-    '1': {'text':'Общая длина забора',
+    '1': {'text':'Длина секции',
         'keyboard': None},
     
-    '2': {'text':'Высота забора',
+    '2': {'text':'Высота секции',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'profNastil_1.5', 
                                                  '1.8m':'profNastil_1.8',
                                                  '2m':'profNastil_2',
@@ -46,15 +46,86 @@ questionProfNastil = {
     '6': {'text': 'Количество калиток',
         'keyboard': None},
 
-    '7': {'text': 'Расстояние от МКАД',
+    '7': {'text': LAST_QUESTION,
+        'keyboard': None},
+}
+
+questionGridRabit = {
+    '1': {'text':'Длина секции',
+        'keyboard': None},
+    
+    '2': {'text':'Высота секции',
+          'keyboard':create_inlinekeyboard_is_row({'1.5m':'GridRabit_1.5', 
+                                                 '1.8m':'GridRabit_1.8',
+                                                 '2m':'GridRabit_2',
+                                                 '2.2m':'GridRabit_2.2',
+                                                 '2.5m':'GridRabit_2.5',
+                                                 '3m':'GridRabit_3',
+                                                 })},
+    
+    '3': {'text': 'Количество протяжек арматуры:',
+        'keyboard':create_inlinekeyboard_is_row({'1 протяжка':'GridRabit_1', 
+                                                 '2 протяжки':'GridRabit_2',                                                
+                                                 })},
+
+    '4': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '5': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    '6': {'text': LAST_QUESTION,
+        'keyboard': None},
+}
+
+question3d = {
+    '1': {'text':'Длина секции',
+        'keyboard': None},
+    
+    '2': {'text':'Высота секции',
+          'keyboard':create_inlinekeyboard_is_row({'1.53m':'3d_1.53', 
+                                                 '1.73m':'3d_1.73',
+                                                 '2.03m':'3d_2.03',
+                                                 })},
+
+    '3': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '4': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    # '5': {'text': 'Расстояние от МКАД',
+    '5': {'text': LAST_QUESTION,
+        'keyboard': None},
+}
+
+questionZaluzi = {
+    '1': {'text':'Длина секции',
+        'keyboard': None},
+    
+    '2': {'text':'Высота секции',
+          'keyboard':create_inlinekeyboard_is_row({'1.5m':'Zaluzi_1.5', 
+                                                 '1.8m':'Zaluzi_1.8',
+                                                 '2m':'Zaluzi_2',
+                                                 '2.2m':'Zaluzi_2.2',
+                                                 '2.5m':'Zaluzi_2.5',
+                                                 })},
+
+    '3': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '4': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    '5': {'text': LAST_QUESTION,
         'keyboard': None},
 }
 
 questionEvroShtak = {
-    '1': {'text':'Общая длина забора',
+    '1': {'text':'Длина секции',
         'keyboard': None},
     
-    '2': {'text':'Высота забора',
+    '2': {'text':'Высота секции',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'evroShtak_1.5', 
                                                  '1.8m':'evroShtak_1.8',
                                                  '2m':'evroShtak_2',
@@ -89,6 +160,6 @@ questionEvroShtak = {
     '6': {'text': 'Количество калиток',
         'keyboard': None},
 
-    '7': {'text': 'Расстояние от МКАД',
+    '7': {'text': LAST_QUESTION,
         'keyboard': None},
 }

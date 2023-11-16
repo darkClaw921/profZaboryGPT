@@ -17,36 +17,40 @@ from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
 from questions import *
+import requests
+from amocrmWork import create_lead
+
 load_dotenv()
 isDEBUG = True
-
+isSend = True
 logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 logger.add("file_1.log", rotation="50 MB")
 gpt = GPT()
 GPT.set_key(os.getenv('KEY_AI'))
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
-sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
+
+# class bot():
+
+# sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
 sql = workYDB.Ydb()
 
+CHAT_ROOM_URL = 'http://127.0.0.1:5004'
+
 TYPE_QUESTIONS = {'profNastil': questionProfNastil,
-                  'evroShtak':questionEvroShtak} 
+                  'evroShtak':questionEvroShtak,
+                  'GridRabit':questionGridRabit,
+                  '3d':question3d,
+                  'Zaluzi':questionZaluzi} 
 URL_USERS = {}
 QUESTS_USERS = {}
 COUNT_ZABOR_USER={}
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
-model_index=gpt.load_search_indexes(MODEL_URL)
-# model_project = gpt.create_embedding(gsText)
-PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
-model= gpt.load_prompt(PROMT_URL)
 
-PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
-#PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
-
-
-
-CHECK_WORDS = sheet.get_words_and_urls()
+def set_isSend():
+    global isSend
+    isSend = False
 
 @bot.message_handler(commands=['addmodel'])
 def add_new_model(message):
@@ -54,6 +58,8 @@ def add_new_model(message):
     bot.send_message(message.chat.id, 
         "Пришлите ссылку model google document и через пробел название модели (model1). Не используйте уже существующие названия модели\n Внимани! конец ссылки должен вылядить так /edit?usp=sharing",)
 
+def send_message_to_telegram(userID, message):
+    bot.send_message(userID, message)
 
 @bot.message_handler(commands=['calc'])
 def add_new_model(message):
@@ -78,6 +84,10 @@ def add_new_model(message):
 @bot.message_handler(commands=['help', 'start'])
 def say_welcome(message):
     username = message.from_user.username
+    userID =  message.chat.id 
+    a = requests.post(f'{CHAT_ROOM_URL}/create/room/{userID}')
+    logger.debug(a)
+    create_lead(userName=username, userID=userID)
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}
@@ -85,6 +95,9 @@ def say_welcome(message):
     sql.replace_query('user', row)
     
     text = """Здравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
+    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {text}')
+    clear_history(message.chat.id)
+    add_message_to_history(userID, 'assistant', text)
     bot.send_message(message.chat.id, text, 
                      parse_mode='markdown',
                      reply_markup= create_menu_keyboard())
@@ -168,14 +181,17 @@ def callback_inline(callFull):
 
         bot.answer_callback_query(callFull.id)
         return 0
-    
-    if call[0] == 'profNastil' or call[0] == 'evroShtak':    
+    if call[0] in ['profNastil','evroShtak', 'GridRabit', '3d', 'Zaluzi']: 
+    # if call[0] == 'profNastil' or call[0] == 'evroShtak':    
         payload = sql.get_payload(userID)
         quest = str(int(payload.split('_')[1]))
         logger.debug(f'{quest=}')
         typeQuest = payload.split('_')[2]
         listQuestions = TYPE_QUESTIONS[typeQuest]
-         
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент: {call[1]}')
+
+        textAnswer=listQuestions[quest]['text']
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}') 
         
         bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
         QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(call[1])
@@ -199,26 +215,86 @@ def any_message(message):
     userID= message.chat.id
     username = message.from_user.username
     payload = sql.get_payload(userID)
+    logger.debug(payload)
+    logger.debug(text)
     
-
+    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент:{text}')
+    # logger.debug(a)
+    
+        
     if text == 'calc':
+        textAnswer = 'Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3.'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
         sql.set_payload(userID, 'quest_0')
-        bot.send_message(userID,'Из скольки видов материала хотите забор? (максимум по 3 секции одного материала)(введите число от 1..3)',)
+
+        bot.send_message(userID,textAnswer,)
+        COUNT_ZABOR_USER[userID]=0
+        # a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
         return 0
     
     if payload == 'quest_0':
         sql.set_payload(userID, 'quest_1') 
         try:
             COUNT_ZABOR_USER[userID]['real'] += 1  
-        except:
+        except Exception as e :
+            logger.debug(f'{e=}')
             COUNT_ZABOR_USER.setdefault(userID, {'max':int(text),
                                                  'real': 1,
                                                  'profNastil': 1,
-                                                 'evroShtak':1})
+                                                 'evroShtak':1,
+                                                 'GridRabit':1,
+                                                 '3d':1,
+                                                 'Zaluzi':1})
+            COUNT_ZABOR_USER[userID] = {'max':int(text),
+                                                 'real': 1,
+                                                 'profNastil': 1,
+                                                 'evroShtak':1,
+                                                 'GridRabit':1,
+                                                 '3d':1,
+                                                 'Zaluzi':1}
+            
         numberZabor = COUNT_ZABOR_USER[userID]['real'] 
-        bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
+
+        textAnswer=f'Из какого материала будет {numberZabor}я секция?'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
         return 0
     
+    if payload == 'quest_last':
+        textAnswer = 'Растояние от МКАД'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        sql.set_payload(userID, 'quest_end')
+        bot.send_message(userID,textAnswer)
+        return 0
+    
+    if payload == 'quest_end':
+        textAnswer='Делаем расчет стоимости забора...'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+
+        bot.send_message(userID,textAnswer)
+        sql.set_payload(userID, 'exit')
+        # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
+        path = ''
+        copyTable = True
+        for answers in QUESTS_USERS[userID]:
+            pprint(QUESTS_USERS[userID])
+            typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
+            print(f'{typeQuest1=}')
+            path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable)   
+            COUNT_ZABOR_USER[userID][answers[0]] += 1
+            copyTable = False
+            #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
+        sheet = Sheet('GDtxt.json',path,get_worksheet=1)
+        sheet.export_pdf(path)
+        with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
+            textAnswer='Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку'
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            
+            bot.send_message(userID,textAnswer)
+            bot.send_document(userID, pdf_file)#filename='file.pdf')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}')
+        return 0
+
     if payload.startswith('quest'):
         QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(text)
         quest = payload.split('_')[1]
@@ -227,6 +303,9 @@ def any_message(message):
         typeQuest = payload.split('_')[2]
         listQuestions = TYPE_QUESTIONS[typeQuest]
         try:
+            textAnswer=listQuestions[quest]['text']
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+
             bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard']) 
         except Exception as e:
 
@@ -250,11 +329,19 @@ def any_message(message):
                 COUNT_ZABOR_USER[userID]['real'] += 1  
             except:
                 COUNT_ZABOR_USER.setdefault(userID, {'max':int(text),
-                                                    'real': 1,
-                                                    'profNastil': 1,
-                                                    'evroShtak':1})
+                                                 'real': 1,
+                                                 'profNastil': 1,
+                                                 'evroShtak':1,
+                                                 'GridRabit':1,
+                                                 '3d':1,
+                                                 'Zaluzi':1})
+                
             numberZabor = COUNT_ZABOR_USER[userID]['real'] 
-            bot.send_message(userID,f'Из какого материала будет {numberZabor}я секция?',reply_markup=keyboard_quest1())
+            textAnswer=f'Из какого материала будет {numberZabor}я секция?' 
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
+            
+            
             return 0
         
         # if COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']+1: 
@@ -264,11 +351,23 @@ def any_message(message):
         print(f"{COUNT_ZABOR_USER[userID]['real']=} {COUNT_ZABOR_USER[userID]['max']=}")
         print(f'{int(quest)=} {len(listQuestions)=}')
         
+
         if int(quest) == len(listQuestions)+1 and COUNT_ZABOR_USER[userID]['real'] < COUNT_ZABOR_USER[userID]['max']:
                 sql.set_payload(userID, 'quest_0') 
                 return 0
+        
         elif int(quest) == len(listQuestions) and COUNT_ZABOR_USER[userID]['real'] == COUNT_ZABOR_USER[userID]['max']:
-            bot.send_message(userID,'Спасибо за ответы, мы просчитаем Ваш проект и свяжемся с вами')
+            sql.set_payload(userID, 'quest_last')
+            any_message(message)
+            return 0
+
+
+
+
+            textAnswer='Делаем расчет стоимости забора...'
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+
+            bot.send_message(userID,textAnswer)
             sql.set_payload(userID, 'exit')
             # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
             path = ''
@@ -284,8 +383,12 @@ def any_message(message):
             sheet = Sheet('GDtxt.json',path,get_worksheet=1)
             sheet.export_pdf(path)
             with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
-                bot.send_message(userID,'Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку')
+                textAnswer='Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку'
+                a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+                
+                bot.send_message(userID,textAnswer)
                 bot.send_document(userID, pdf_file)#filename='file.pdf')
+                a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}')
         else:    
             sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
 
@@ -323,8 +426,10 @@ def any_message(message):
         if text == 'aabb':
             #принудительная саммари диалога
             1/0
+        
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, lastMessage+text, history, model_index,temp=0.5, verbose=0)
-    
+        # else:
+            
         logger.info(f'ответ сети если нет ощибок: {answer}')
     except Exception as e:
         #саммари если превышено колтчество токенов
@@ -332,7 +437,12 @@ def any_message(message):
         history = summary(userID, e) 
         
         answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
-        bot.send_message(message.chat.id, answer)
+        
+        textAnswer=answer
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        if isSend:
+            bot.send_message(message.chat.id, answer)
+
         add_message_to_history(userID, 'assistant', answer)
 
         return 0 
@@ -349,7 +459,10 @@ def any_message(message):
         
     # photoFolder = message_content[0].page_content.find('https://drive') 
     # logger.info(f'{photoFolder=}')
-    bot.send_message(message.chat.id, answer,  parse_mode='markdown')
+    textAnswer=answer
+    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+    if isSend:
+        bot.send_message(message.chat.id, answer,  parse_mode='markdown')
     media_group = []
 
     photoFolder = -1
@@ -365,17 +478,28 @@ def any_message(message):
         # matches = list(set(matches))
         #TODO удалить если нужно чтобы фото отправлялись по 1 разу
         #URL_USERS={}
-        bot.send_message(message.chat.id, 'Подождите, ищу фото проектов...',  parse_mode='markdown')
+        isFirst = True
+        
         for url in urls:
             try:
                 URL_USERS, media_group,nameProject = download_photo(url,URL_USERS,userID,)
-                if media_group == []:
+                if media_group == [] or media_group == 0:
                     continue
-                bot.send_message(message.chat.id, f'Отправляю фото проекта {nameProject}...',  parse_mode='markdown')
+                if isFirst:
+                    isFirst = False
+                    bot.send_message(message.chat.id, 'Подождите, ищу фото проектов...',  parse_mode='markdown')
+                
+                textAnswer=f'Отправляю фото {nameProject}...'
+                
+
+                bot.send_message(message.chat.id, textAnswer,  parse_mode='markdown')
                 bot.send_media_group(message.chat.id, media_group,)
+
             except Exception as e:
-                bot.send_message(message.chat.id, 'Извините, не могу найти актуальные фото',  parse_mode='markdown') 
-                #bot.send_message(message.chat.id, e,  parse_mode='markdown')
+                textAnswer=f'Извините, не могу найти актуальные фото'
+                bot.send_message(message.chat.id, textAnswer,  parse_mode='markdown') 
+                bot.send_message(message.chat.id, e,  parse_mode='markdown')
+                a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}') 
     if b >= 0:
         print(f"{prepareAnswer.find('cпасибо за предоставленный номер')=}")
         PROMT_SUMMARY = gpt.load_prompt(PROMT_URL_SUMMARY)
@@ -421,6 +545,22 @@ def any_message(message):
     sql.insert_query('all_user_dialog',  rows)
 
 
-    
-print(f'[OK]')
-bot.infinity_polling()
+if __name__ == '__main__':
+        
+    # #TODO
+    # model_index=gpt.load_search_indexes(MODEL_URL)
+
+    # # model_project = gpt.create_embedding(gsText)
+    # PROMT_URL = 'https://docs.google.com/document/d/10PvyALgUYLKl-PYwwe2RZjfGX5AmoTvfq6ESfemtFGI/edit?usp=sharing'
+    # model= gpt.load_prompt(PROMT_URL)
+
+    # PROMT_URL_SUMMARY ='https://docs.google.com/document/d/1XhSDXvzNKA9JpF3QusXtgMnpFKY8vVpT9e3ZkivPePE/edit?usp=sharing'
+    # #PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
+
+    # #TODO
+    # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
+
+    # #TODO
+    # CHECK_WORDS = sheet.get_words_and_urls()
+    print(f'[OK]')
+    bot.infinity_polling()

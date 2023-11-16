@@ -22,7 +22,8 @@ class Sheet():
         self.sheet = self.client.open(
             #sheetName).sheet1  # get_worksheet(0)  # Имя таблицы
             sheetName).get_worksheet(get_worksheet)  # get_worksheet(0)  # Имя таблицы
-
+        
+        # self.sheet.range(). (1, 1). # Активируем ячейку
     @logger.catch
     def send_cell(self, cell: str, value, form: bool = False):
         """
@@ -57,6 +58,7 @@ class Sheet():
     def get_words_and_urls(self):
         lst = []
         for i in tqdm(range(2,11)):
+            time.sleep(1.2)
             value = self.get_rom_value(i)
             lst.extend(prepare_words(value))
             #print(f'{b=}')
@@ -89,12 +91,22 @@ class Sheet():
         pass
     
     def export_pdf(self, namePdf):
-        url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704'
+        # https://docs.google.com/spreadsheets/d/1mcCpoSlQN3c3JnJKBuopKsLnAcrgmP-qR3RLMbRRgC4/edit#gid=829589704&fvid=309977290
+        # https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827
+        urlFilter = f"https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/edit#gid=829589704&fvid=837598827"
+        #urlFilter = f'https://sheets.googleapis.com/v4/spreadsheets/{self.sheetAll.id}?fields=sheets/filterViews'
+        url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704&fvid=837598827'
+        print(f'{urlFilter=}')
+        headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
+        res = requests.get(urlFilter, headers=headers)
+        logger.critical(res.json())
+
+        url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704&fvid=837598827'
         print(f'{url=}')
         headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
         res = requests.get(url, headers=headers)
-        # with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
-        #     f.write(res.content)
+        with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
+            f.write(res.content)
         return url
 
 @dataclass
@@ -136,12 +148,15 @@ def prepare_words(lst:list):
 
 
 if __name__ == '__main__':
-    json = 'kgtaprojects-8706cc47a185.json'
-    sheet = Sheet(json,'testCopy')
+    import pdfkit
+    pdfkit.from_url('https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827', 'out.pdf')
+    # json = 'GDtxt.json'
+    # sheet = Sheet(json,'darkClaw921_Zaluzi')
+    
     #a = sheet.get_rom_value(7) 
     # a = sheet.get_words_and_urls()
-    a = sheet.copy_sheet('testCopy5')
-    pprint(a)
+    # a = sheet.copy_sheet('testCopy5')
+    # pprint(a)
     #for aa in a:
     #    print(f'{aa=}')
     #a = prepare_text(a)

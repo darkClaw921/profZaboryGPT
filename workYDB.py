@@ -222,7 +222,7 @@ class Ydb:
         return context
     
     def set_payload(self, userID: int, entity:str):
-        query = f'UPDATE SaleBot SET payload = "{entity}" WHERE id = {userID}'
+        query = f'UPDATE user SET payload = "{entity}" WHERE id = {userID}'
         #print(query)
         def a(session):
             session.transaction(ydb.SerializableReadWrite()).execute(
@@ -233,7 +233,7 @@ class Ydb:
 
 
     def get_payload(self, whereID: int):
-        query = f'SELECT payload FROM SaleBot WHERE id = {whereID}'
+        query = f'SELECT payload FROM user WHERE id = {whereID}'
         print(query)
 
         def a(session):
@@ -242,11 +242,15 @@ class Ydb:
                 commit_tx=True,
             )
         b = pool.retry_operation_sync(a)
-        rez = b[0].rows[0]['payload']
+        if b[0].rows == []:
+            return ''
+        else:
+            rez = b[0].rows[0]['payload'].decode()
+        
         return rez
     
     def get_leadID(self, whereID: int):
-        query = f'SELECT leadID FROM SaleBot WHERE id = {whereID}'
+        query = f'SELECT leadID FROM user WHERE id = {whereID}'
         print(query)
 
         def a(session):

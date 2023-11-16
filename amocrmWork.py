@@ -7,15 +7,15 @@ load_dotenv()
 tokens.default_token_manager(
     client_id = os.environ.get('client_id_amocrm'),
     client_secret = os.environ.get('client_secret_amocrm'),
-    # subdomain = "darkclaw921",
-    subdomain = "profzabor",
+    subdomain = "darkclaw921",
+    # subdomain = "profzabor",
     redirect_url = "https://functions.yandexcloud.net/d4e4rh9tdbt4igqcj37q",
 
     storage=tokens.FileTokensStorage(),  # by default FileTokensStorage
 )
 
 tokens.default_token_manager.get_access_token()
-# tokens.default_token_manager.init(code="", skip_error=True)
+# tokens.default_token_manager.init(code=os.environ.get('long_code'), skip_error=True)
 
 from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field, filters, interaction, Event
 # Event.
@@ -41,9 +41,21 @@ class Lead(_Lead):
     noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
     # phone1 = custom_field.ContactPhoneField('phone')
 
+
 class Contact(_Contact):
     phone = custom_field.ContactPhoneField('phone')
     # dealID = custom_field('linked_leads')
+
+
+def create_lead(userName, userID):
+    # data = {'name'}
+    lead = Lead()
+    lead.name = userName
+    # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
+    lead.record_text = f'https://8bf5-178-234-10-41.ngrok-free.app/room/{userID}'
+    lead.save()
+    # Lead.create(name=userName)
+    # Lead.save()
 
 def get_leadID_from_contact(phone:str):
     conta = Contact.objects.get(query=phone)
@@ -77,7 +89,8 @@ def check_need_answered_for(leadID:int):
 
 if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')
-    a = check_need_answered_for(leadID=435263)
-    print(a)
+    create_lead('igor',12414245)
+    # a = check_need_answered_for(leadID=435263)
+    # print(a)
     # lead.record_text = 'text'
     # lead.save()

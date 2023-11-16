@@ -197,6 +197,58 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('AP8', pokrytie[str(values[4])])
         sheet.send_cell('AP16', values[5])
         sheet.send_cell('AP23', values[6])
+    
+    if typeMaterial == 'GridRabit1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('AX2', str(values[1]).replace('.',','))
+        sheet.send_cell('AX3', str(values[2]).replace('.',','))
+        sheet.send_cell('AX4', values[3])
+        sheet.send_cell('AX15', values[4])
+        sheet.send_cell('AX22', values[5])
+    
+    if typeMaterial == 'GridRabit2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('BF2', str(values[1]).replace('.',','))
+        sheet.send_cell('BF3', str(values[2]).replace('.',','))
+        sheet.send_cell('BF4', values[3])
+        sheet.send_cell('BF15', values[4])
+        sheet.send_cell('BF22', values[5])
+    
+    if typeMaterial == '3d1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('BN2', str(values[1]).replace('.',','))
+        sheet.send_cell('BN3', str(values[2]).replace('.',','))
+        sheet.send_cell('BN16', values[3])
+        sheet.send_cell('BN23', values[4])
+    
+    if typeMaterial == '3d2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('BV2', str(values[1]).replace('.',','))
+        sheet.send_cell('BV3', str(values[2]).replace('.',','))
+        sheet.send_cell('BV16', values[3])
+        sheet.send_cell('BV23', values[4])
+    
+    if typeMaterial == 'Zaluzi1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('CT2', str(values[1]).replace('.',','))
+        sheet.send_cell('CT3', str(values[2]).replace('.',','))
+        sheet.send_cell('CT16', values[3])
+        sheet.send_cell('CT23', values[4])
+
+        
     # sheet.export_pdf(sheetName)
     return sheetName
 
@@ -224,6 +276,7 @@ def download_file(url):
     urllib.request.urlretrieve(url, full_path)  # Скачиваем файл по ссылке и сохраняем его по указанному пути
     return full_path
 
+
 @logger.catch
 def download_photo(urlExtract, URL_USERS, userID,):
 
@@ -240,7 +293,7 @@ def download_photo(urlExtract, URL_USERS, userID,):
             URL_USERS.setdefault(userID,[urlExtract])
         else: 
             if urlExtract in URL_USERS[userID]:
-                return 0
+                return URL_USERS,0,0
             else:
                 URL_USERS[userID].append(urlExtract) 
     except Exception as e:
@@ -260,10 +313,14 @@ def download_photo(urlExtract, URL_USERS, userID,):
     logger.info(f'{downloadFiles=}')
     #media_group = []
     for photo in downloadFiles:
+        if photo.split('.')[1].lower() == 'mp4': continue
         #path = '/Users/igorgerasimov/Python/Bitrix/test-chatGPT'
-        media_group.append(InputMediaPhoto(open(f'downloads/{photo}', 'rb'),
-        #media_group.append(InputMediaPhoto(open(f'{path}/{photo}', 'rb'),
+        try:
+            media_group.append(InputMediaPhoto(open(f'downloads/{photo}', 'rb'),
                                 caption = photo))
+        except Exception as e:
+            logger.error(e)
+            continue
     #mediaGroup = create_media_gorup(download_files)
     #bot.send_media_group(message.chat.id, mediaGroup)
     #bot.send_media_group(message.chat.id, media_group,)
@@ -271,7 +328,8 @@ def download_photo(urlExtract, URL_USERS, userID,):
     #answer = answer
     #answer = re.sub(r'\[.*?\]\(.*?\)', '', message_content).replace(' ссылка на', '')
     #answer = remove_empty_lines(message_content)
-    nameProject = downloadFiles[0].split(' ')[0]
+    # nameProject = downloadFiles[0].split(' ')[0]
+    nameProject = downloadFiles[0].split('-')[0]
     #except Exception as e:
     #    logger.error(e)
         #answer = 'Извините сейчас не могу найти актуальную ссылку'

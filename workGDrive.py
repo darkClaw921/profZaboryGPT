@@ -44,8 +44,10 @@ def download_files(FOLDER_ID:str, maxFile:int = 5)-> list:
     file_list = []
 
     for i, item in enumerate(items):
+        if item['mimeType'] == 'video/mp4': continue
         file_id = item['id']
         #file_name = os.path.join(download_folder, item['name'])
+
         file_name = f"{folder_info['name']} - {i}.png"
 
         request = drive.files().get_media(fileId=file_id)
@@ -58,8 +60,9 @@ def download_files(FOLDER_ID:str, maxFile:int = 5)-> list:
 
         print(f'Successfully downloaded file: {file_name}')
         file_list.append(file_name)
-        if i == maxFile-1:
+        if i >= maxFile-1:
             return file_list
+        
 
     print('All files downloaded successfully.')
     return file_list
