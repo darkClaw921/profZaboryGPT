@@ -99,12 +99,20 @@ class Sheet():
         print(f'{urlFilter=}')
         headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
         res = requests.get(urlFilter, headers=headers)
-        logger.critical(res.json())
+        # options={'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
+        pdfkit.from_url('https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827', 'out.pdf',options=headers)
+        # logger.critical(res.json())
+        with open('test.html', 'wb') as f:
+            f.write(res.content)
+        # return url
 
         url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704&fvid=837598827'
         print(f'{url=}')
         headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
         res = requests.get(url, headers=headers)
+        
+        
+        # with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
         with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
             f.write(res.content)
         return url
@@ -149,7 +157,8 @@ def prepare_words(lst:list):
 
 if __name__ == '__main__':
     import pdfkit
-    pdfkit.from_url('https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827', 'out.pdf')
+    # pdfkit.from_file('test.html', 'out.pdf')
+    
     # json = 'GDtxt.json'
     # sheet = Sheet(json,'darkClaw921_Zaluzi')
     
