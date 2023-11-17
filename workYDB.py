@@ -33,9 +33,9 @@ intList = ['all_token', 'all_messages', 'time_epoh', 'token', 'stock_id','id'
 floatList = ['token_price','amount','price_open',
               'price_insert','price_close','need_price_close','bb_bu',
               'rate_change', 'lower_price', 'upper_price','need_price_close','price_open',
-              'persent_ot_depo','depo', 'depo_deals','commission','cred_plecho','stop_loss']
+              'persent_ot_depo','depo', 'depo_deals','commission','cred_plecho','stop_loss','all_price']
 
-dateTimeList = ['date_time','date_close','need_data_close','date_open', 'date_open','deal_id'] 
+dateTimeList = ['date_time','date_close','need_data_close','date_open', 'date_open','deal_id','time_last_mess'] 
 class Ydb:
     def replace_query(self, tableName: str, rows: dict):
         field_names = rows.keys()
@@ -87,21 +87,17 @@ class Ydb:
         for key, value in rows.items():
             if key in ['ID']:
                 continue
-            if key == 'all_price':
+            if key in floatList:
                 sets += f'{key} = {float(value)},'
-            elif key in ['all_token', 'all_messages']:
+            elif key in intList:
                 sets += f'{key} = {int(value)},'
+            
+            elif key in dateTimeList:
+                sets += f'{key} = CAST("{value}" AS datetime ),' 
+            
             else:
                 sets += f'{key} = "{value}",'
 
-            """
-            try:
-                sets += f'{key} = {int(value)},'
-                
-            except Exception as e:
-                print(e)
-                sets += f"{key} = '{value}',"
-            """
         sets = sets[:-1]
 
         # values_placeholder_format = ', '.join(my_list)

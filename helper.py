@@ -2,7 +2,7 @@ import re
 import telebot
 from loguru import logger
 #import datetime 
-from datetime import datetime
+from datetime import datetime, timedelta
 from workGDrive import *
 from workGS import *
 from telebot.types import InputMediaPhoto
@@ -15,6 +15,30 @@ r = sr.Recognizer()
 
 
 # any
+def get_dates(day):
+    # Текущая дата
+    #patern = '2023-07-18T20:26:32Z'
+    patern = '%Y-%m-%dT%H:%M:%SZ'
+    current_date = datetime.now().strftime(patern)
+
+    # Дата, отстоящая на 30 дней
+    delta = timedelta(days=day)
+    future_date = (datetime.now() + delta).strftime(patern)
+
+    return current_date, future_date
+
+def timestamp_to_date(timestap, pattern = '%Y-%m-%dT%H:%M:%SZ'):
+   
+    """timestamp
+
+    Returns:
+        str: %Y-%m-%dT%H:%M:%SZ
+    """
+    a = time.gmtime(timestap)
+    date_time = datetime(*a[:6])
+    date_string = date_time.strftime(pattern)
+    
+    return date_string
 
 def time_epoch():
     from time import mktime
@@ -113,9 +137,6 @@ def check_need_words(data:list, text:str):
     return ursl
     #return False
 
-
-   
-
 def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:bool=False):
     if first:
         copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
@@ -129,8 +150,8 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('B2', str(values[1]).replace('.',','))
         sheet.send_cell('B3', str(values[2]).replace('.',',').replace('m',''))
         sheet.send_cell('B6', str(values[3]).replace('.',',').replace('mm',''))
-        # sheet.send_cell('B8', pokrytie[str(values[4])])
-        sheet.send_cell('B8', str(values[4]))
+        sheet.send_cell('B8', pokrytie[str(values[4])])
+        # sheet.send_cell('B8', str(values[4]))
         sheet.send_cell('B16', values[5])
         sheet.send_cell('B23', values[6])
         try:
@@ -165,10 +186,10 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         print(a)
         sheet.send_cell('Z2', str(values[1]).replace('.',','))
         sheet.send_cell('Z3', str(values[2]).replace('.',','))
-        # sheet.send_cell('Z6', porydok[str(values[3])])
-        # sheet.send_cell('Z8', pokrytie[str(values[4])])
-        sheet.send_cell('Z6', str(values[3]))
-        sheet.send_cell('Z8', str(values[4]))
+        sheet.send_cell('Z6', porydok[str(values[3])])
+        sheet.send_cell('Z8', pokrytie[str(values[4])])
+        # sheet.send_cell('Z6', str(values[3]))
+        # sheet.send_cell('Z8', str(values[4]))
         sheet.send_cell('Z16', values[5])
         sheet.send_cell('Z23', values[6])
         try:
@@ -248,7 +269,7 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('CT16', values[3])
         sheet.send_cell('CT23', values[4])
 
-        
+
     # sheet.export_pdf(sheetName)
     return sheetName
 
@@ -352,7 +373,6 @@ def summary(userID, error, isDEBUG):
     answer, allToken, allTokenPrice, message_content = gpt.answer_index(model, text, history, model_index,temp=0.5, verbose=0)
     bot.send_message(message.chat.id, answer)
     add_message_to_history(userID, 'assistant', answer)
-
 
 r = sr.Recognizer()
 

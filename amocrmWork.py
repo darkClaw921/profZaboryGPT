@@ -7,8 +7,8 @@ load_dotenv()
 tokens.default_token_manager(
     client_id = os.environ.get('client_id_amocrm'),
     client_secret = os.environ.get('client_secret_amocrm'),
-    subdomain = "darkclaw921",
-    # subdomain = "profzabor",
+    # subdomain = "darkclaw921",
+    subdomain = "profzabor",
     redirect_url = "https://functions.yandexcloud.net/d4e4rh9tdbt4igqcj37q",
 
     storage=tokens.FileTokensStorage(),  # by default FileTokensStorage
@@ -38,7 +38,8 @@ from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field,
 
 class Lead(_Lead):
     record_text = custom_field.TextAreaCustomField("record text")
-    noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
+    # noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
+    urlChatRoom = custom_field.UrlCustomField('чат с клиентом',code='1346015')
     # phone1 = custom_field.ContactPhoneField('phone')
 
 
@@ -52,7 +53,7 @@ def create_lead(userName, userID):
     lead = Lead()
     lead.name = userName
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
-    lead.record_text = f'https://8bf5-178-234-10-41.ngrok-free.app/room/{userID}'
+    lead.urlChatRoom = f'https://8bf5-178-234-10-41.ngrok-free.app/room/{userID}'
     lead.save()
     # Lead.create(name=userName)
     # Lead.save()

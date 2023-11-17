@@ -47,7 +47,7 @@ def prepare_calls_stats(calls:str):
                 continue
             callDic[nameValue]=valueCall
             
-        pprint(callDic)
+        # pprint(callDic)
         if callDic != {}:
             lstCall.append(callDic)
     return lstCall
@@ -97,14 +97,14 @@ def prepare_answer_gpt(answerGPT):
     return ball, rez, good, bad, recomend
 @logger.catch
 def main():
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(hours=2)), to_date=datetime.now(), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=4)), to_date=datetime.now(), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
-    logger.debug(f'{len(calls)}')
+    # logger.debug(f'{len(calls)}')
     # return 0 
     for call in calls:
-        pprint(call)
+        # pprint(call)
         try: 
-            if float(call['Длительность звонка']) >= 60:
+            if float(call['Длительность звонка']) <= 100:
                 print(f"{call['Длительность звонка']=} {call['ID записи']=}")
                 phone = call['Откуда']
                 date = call['Время']
@@ -112,30 +112,33 @@ def main():
                 
                 
                 duration = call['Длительность звонка'] 
-                isNew =True if call['Новый клиент']=='1' else False
-                if not isNew:
-                    continue
+                # isNew =True if call['Новый клиент']=='1' else False
+                # if not isNew:
+                #     continue
                 urlDeal = get_leadID_from_contact(phone)
                 urlDeal = f'https://profzabor.amocrm.ru/leads/detail/{urlDeal}'
                 logger.debug(urlDeal)
                 try:
                     #TODO переделать на async
                     text = get_url_record(call['ID записи']) 
-                except:
+                except Exception as e:
+                    logger.error(e)
                     continue
                 
                 #иногда нужно повторить
+                logger.debug('отправляем в gpt')
                 try:
                     answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
                 except:
                     answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
-
+                logger.debug('получили ответ от gpt')
                 ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
                 print(answerGPT)
                 lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT]
                 sheet.insert_cell(data=lst)
-                
-        except:
+                    
+        except Exception as e:
+            logger.error(e)
             continue
             # get_url_record(call['ID записи'])
         #TODO

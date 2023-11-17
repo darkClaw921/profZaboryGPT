@@ -6,6 +6,7 @@ from pprint import pprint
 import time
 from tqdm import tqdm
 import requests
+
 class Sheet():
     
     @logger.catch
@@ -55,9 +56,12 @@ class Sheet():
         1 - первая строка
         """
         return self.sheet.row_values(i)
+    
     def get_words_and_urls(self):
         lst = []
-        for i in tqdm(range(2,11)):
+        logger.info('get_words_and_urls')
+        for i in range(2,11):
+            logger.info(f'{i=}')
             time.sleep(1.2)
             value = self.get_rom_value(i)
             lst.extend(prepare_words(value))
@@ -93,17 +97,19 @@ class Sheet():
     def export_pdf(self, namePdf):
         # https://docs.google.com/spreadsheets/d/1mcCpoSlQN3c3JnJKBuopKsLnAcrgmP-qR3RLMbRRgC4/edit#gid=829589704&fvid=309977290
         # https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827
-        urlFilter = f"https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/edit#gid=829589704&fvid=837598827"
+        # urlFilter = f"https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/edit#gid=829589704&fvid=837598827"
         #urlFilter = f'https://sheets.googleapis.com/v4/spreadsheets/{self.sheetAll.id}?fields=sheets/filterViews'
         url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704&fvid=837598827'
-        print(f'{urlFilter=}')
-        headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
-        res = requests.get(urlFilter, headers=headers)
-        # options={'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
-        pdfkit.from_url('https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827', 'out.pdf',options=headers)
-        # logger.critical(res.json())
-        with open('test.html', 'wb') as f:
-            f.write(res.content)
+        
+
+        # print(f'{urlFilter=}')
+        # headers = {'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
+        # res = requests.get(urlFilter, headers=headers)
+        # # options={'Authorization': 'Bearer ' + self.creds.create_delegated("").get_access_token().access_token}
+        # # pdfkit.from_url('https://docs.google.com/spreadsheets/d/1O-bmsKyZsIFmoYchvRznAKK14AIeMlI8HGHsWFXBAzI/edit#gid=829589704&fvid=837598827', 'out.pdf',options=headers)
+        # # logger.critical(res.json())
+        # with open('test.html', 'wb') as f:
+        #     f.write(res.content)
         # return url
 
         url = f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}/export?format=pdf&gid=829589704&fvid=837598827'
@@ -156,8 +162,7 @@ def prepare_words(lst:list):
 
 
 if __name__ == '__main__':
-    import pdfkit
-    # pdfkit.from_file('test.html', 'out.pdf')
+    pass
     
     # json = 'GDtxt.json'
     # sheet = Sheet(json,'darkClaw921_Zaluzi')
