@@ -51,7 +51,7 @@ class Contact(_Contact):
 def create_lead(userName, userID):
     # data = {'name'}
     lead = Lead()
-    lead.name = userName
+    lead.name = f'Клиент {userName} из Telegram'
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
     lead.urlChatRoom = f'https://8bf5-178-234-10-41.ngrok-free.app/room/{userID}'
     lead.save()
