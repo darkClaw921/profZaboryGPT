@@ -114,7 +114,8 @@ def say_welcome(message):
     logger.debug(a)
     isSend = True
 
-    create_lead(userName=username, userID=userID)
+    # create_lead(userName=username, userID=userID)
+    
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}
