@@ -13,10 +13,10 @@ porydok = {'normal':'Обычный',
     }
 LAST_QUESTION = 'Это конец вопросов секции'
 questionProfNastil = {
-    '1': {'text':'Длина секции',
+    '1': {'text':'Длина ',
         'keyboard': None},
     
-    '2': {'text':'Высота секции',
+    '2': {'text':'Высота',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'profNastil_1.5', 
                                                  '1.8m':'profNastil_1.8',
                                                  '2m':'profNastil_2',
@@ -51,16 +51,16 @@ questionProfNastil = {
 }
 
 questionGridRabit = {
-    '1': {'text':'Длина секции',
+    '1': {'text':'Длина ',
         'keyboard': None},
     
-    '2': {'text':'Высота секции',
+    '2': {'text':'Высота',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'GridRabit_1.5', 
                                                  '1.8m':'GridRabit_1.8',
                                                  '2m':'GridRabit_2',
-                                                 '2.2m':'GridRabit_2.2',
-                                                 '2.5m':'GridRabit_2.5',
-                                                 '3m':'GridRabit_3',
+                                                #  '2.2m':'GridRabit_2.2',
+                                                #  '2.5m':'GridRabit_2.5',
+                                                #  '3m':'GridRabit_3',
                                                  })},
     
     '3': {'text': 'Количество протяжек арматуры:',
@@ -79,10 +79,10 @@ questionGridRabit = {
 }
 
 question3d = {
-    '1': {'text':'Длина секции',
+    '1': {'text':'Длина ',
         'keyboard': None},
     
-    '2': {'text':'Высота секции',
+    '2': {'text':'Высота',
           'keyboard':create_inlinekeyboard_is_row({'1.53m':'3d_1.53', 
                                                  '1.73m':'3d_1.73',
                                                  '2.03m':'3d_2.03',
@@ -100,10 +100,10 @@ question3d = {
 }
 
 questionZaluzi = {
-    '1': {'text':'Длина секции',
+    '1': {'text':'Длина ',
         'keyboard': None},
     
-    '2': {'text':'Высота секции',
+    '2': {'text':'Высота',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'Zaluzi_1.5', 
                                                  '1.8m':'Zaluzi_1.8',
                                                  '2m':'Zaluzi_2',
@@ -122,16 +122,16 @@ questionZaluzi = {
 }
 
 questionEvroShtak = {
-    '1': {'text':'Длина секции',
+    '1': {'text':'Длина ',
         'keyboard': None},
     
-    '2': {'text':'Высота секции',
+    '2': {'text':'Высота',
           'keyboard':create_inlinekeyboard_is_row({'1.5m':'evroShtak_1.5', 
                                                  '1.8m':'evroShtak_1.8',
                                                  '2m':'evroShtak_2',
                                                  '2.2m':'evroShtak_2.2',
                                                  '2.5m':'evroShtak_2.5',
-                                                 '3m':'evroShtak_3',
+                                                #  '3m':'evroShtak_3',
                                                  })},
     
     '3': {'text': 'Порядок штакетин в заборе из евроштакетника:',
