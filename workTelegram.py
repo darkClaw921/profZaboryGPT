@@ -31,10 +31,11 @@ bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 
 # class bot():
 
-# sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
+# sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')s
 sql = workYDB.Ydb()
 
-CHAT_ROOM_URL = 'http://127.0.0.1:5004'
+CHAT_ROOM_URL = os.environ.get('CHAT_ROOM_URL')
+
 
 TYPE_QUESTIONS = {'profNastil': questionProfNastil,
                   'evroShtak':questionEvroShtak,
@@ -283,7 +284,7 @@ def any_message(message):
             
         numberZabor = COUNT_ZABOR_USER[userID]['real'] 
 
-        textAnswer=f'Из какого материала будет {numberZabor}я секция?'
+        textAnswer=f'Из какого материала будет {numberZabor}я часть?'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
         bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
         return 0
@@ -370,7 +371,7 @@ def any_message(message):
                                                  'Zaluzi':1})
                 
             numberZabor = COUNT_ZABOR_USER[userID]['real'] 
-            textAnswer=f'Из какого материала будет {numberZabor}я секция?' 
+            textAnswer=f'Из какого материала будет {numberZabor}я часть?' 
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
             bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
             
