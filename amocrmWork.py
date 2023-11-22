@@ -61,6 +61,7 @@ def create_lead(userName, userID):
 def get_leadID_from_contact(phone:str):
     conta = Contact.objects.get(query=phone)
     leadID = conta.leads._data[0]['id']
+    # leadID = conta.leads._data
     return leadID
     # lead = Lead.objects.get(f'{leadID}')
 
@@ -69,6 +70,7 @@ def update_lead(phone:str, text:str):
 
     # conta = Contact.objects.get(query='89308316687')
     conta = Contact.objects.get(query=phone)
+    # leadID = conta.leads._data[0]['id']
     leadID = conta.leads._data[0]['id']
     lead = Lead.objects.get(f'{leadID}')
     # print(lead)
@@ -90,8 +92,9 @@ def check_need_answered_for(leadID:int):
 
 if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')
-    
-    create_lead('igor',12414245)
+    a = get_leadID_from_contact('79636201537')
+    print(a)
+    # create_lead('igor',12414245)
     # a = check_need_answered_for(leadID=435263)
     # print(a)
     # lead.record_text = 'text'

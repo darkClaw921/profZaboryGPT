@@ -309,7 +309,7 @@ def any_message(message):
             pprint(QUESTS_USERS[userID])
             typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
             print(f'{typeQuest1=}')
-            path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable)   
+            path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
             COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   

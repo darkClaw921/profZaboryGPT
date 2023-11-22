@@ -137,7 +137,7 @@ def check_need_words(data:list, text:str):
     return ursl
     #return False
 
-def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:bool=False):
+def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:bool=False, mkad=0):
     if first:
         copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
     sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
@@ -268,7 +268,7 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('CT3', str(values[2]).replace('.',','))
         sheet.send_cell('CT16', values[3])
         sheet.send_cell('CT23', values[4])
-
+    sheet.send_cell('C170', mkad)
 
     # sheet.export_pdf(sheetName)
     return sheetName
