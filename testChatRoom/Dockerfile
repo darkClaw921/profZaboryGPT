@@ -17,7 +17,7 @@ WORKDIR /app
 
 # Копируем файлы helper.py, chat.py, workFlask.py и workBinance.py в директорию /app контейнера
 # COPY chat.py helper.py index.py workBitrix.py workGDrive.py workGS.py workRedis.py workTelegram.py yandexDiskWork.py workYDB.py createKeyboard.py run.sh /app/
-COPY main.py testDIr requirments.txt /app/
+COPY chatRoom.py testDIr requirments.txt /app/
 # Копируем файл requirements.txt в директорию /app контейнера
 # COPY requirements.txt /app/
 
@@ -32,4 +32,4 @@ EXPOSE 5004
 # RUN chmod +x /app/run.sh
 # CMD ["/app/run.sh"]
 # CMD ["sudo apt install ", "python3-testresources"]
-CMD ["python", "main.py"]
+CMD ["python", "chatRoom.py"]
