@@ -97,7 +97,8 @@ def prepare_answer_gpt(answerGPT):
     return ball, rez, good, bad, recomend
 @logger.catch
 def main():
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=4)), to_date=datetime.now(), first_time=1)   # return csv data
+    # calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=4)), to_date=datetime.now(), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=6)), to_date=(datetime.now() - timedelta(days=5)), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
     # logger.debug(f'{len(calls)}')
     # return 0 
@@ -138,7 +139,7 @@ def main():
             logger.debug('получили ответ от gpt')
             ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
             print(answerGPT)
-            lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT]
+            lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone]
             sheet.insert_cell(data=lst)
                     
         # except Exception as e:
@@ -150,7 +151,8 @@ def main():
     pass
 if __name__ == '__main__':
     # a = sheet.get_cell(6,3)
-    text='Алло\nЗдравствуйте компания вопрос забора вы заявочку оставляли на расчет удобно пообщаться\nЕсли меня слышно то удобно\nВчера актуальная тема для вас на этот год планируете или на следующий\nНет вот в течение недели 2 планирую\nДавайте примерно сориентирую по ценам вот эти 30 м 1 и 8 высота одностороннее покрытие без ворот без калитки все вместе под ключ обойдется 76 200\nПримерно 30 32 м профнастил\nАвтомобильские или механические страницы\nНе знаю\nСегодня будем переезжать вот ну примерно 3,5 там не было\nВорота откатные механические если с обшивкой из профлиста в районе 85 с автоматикой 120 где то выходит\nВот так более детально замерщик выезжает с образцами с ним уже по месту можно все обсудить если вместе будете заказывать то тогда дешевле сделаю\nЕсли вместе то ошибка профлист нужна или какой материал\nОбшивка профлист нужна или какой материал\nАлло\nАлло вас не слышно\n'
+    # text='Алло\nЗдравствуйте компания вопрос забора вы заявочку оставляли на расчет удобно пообщаться\nЕсли меня слышно то удобно\nВчера актуальная тема для вас на этот год планируете или на следующий\nНет вот в течение недели 2 планирую\nДавайте примерно сориентирую по ценам вот эти 30 м 1 и 8 высота одностороннее покрытие без ворот без калитки все вместе под ключ обойдется 76 200\nПримерно 30 32 м профнастил\nАвтомобильские или механические страницы\nНе знаю\nСегодня будем переезжать вот ну примерно 3,5 там не было\nВорота откатные механические если с обшивкой из профлиста в районе 85 с автоматикой 120 где то выходит\nВот так более детально замерщик выезжает с образцами с ним уже по месту можно все обсудить если вместе будете заказывать то тогда дешевле сделаю\nЕсли вместе то ошибка профлист нужна или какой материал\nОбшивка профлист нужна или какой материал\nАлло\nАлло вас не слышно\n'
+    text='ты кто?'
     answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
     logger.debug(answerGPT) 
     # print(a)

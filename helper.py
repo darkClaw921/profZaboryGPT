@@ -406,6 +406,9 @@ def voice_processing(filename:str, response):
     os.remove(file_name_full_converted)
     return text
 
+
+#chatRoom
+
 if __name__ == '__main__':
 #     data = [{'url': 'https://drive.google.com/drive/folders/18MGvuit-R5PJFyJ902M_DpyQTC6VFzCH',
 #   'words': ['из евроштакетника', 'евроштакетник'],

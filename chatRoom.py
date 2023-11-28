@@ -4,6 +4,12 @@ import random
 from pprint import pprint
 from loguru import logger
 from workTelegram import send_message_to_telegram, set_isSend
+import os
+import telebot
+from dotenv import load_dotenv
+load_dotenv()
+from workYDB import Ydb
+from helper import get_dates, time_epoch
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "supersecretkey"
 # app.config['SERVER_CERT'] = 'cert.pem'
@@ -11,11 +17,41 @@ app.config["SECRET_KEY"] = "supersecretkey"
 socketio = SocketIO(app)
 
 # A mock database to persist data
-rooms = {}
+
 
 # def send_message_to_telegram():
     
     # pass
+sql = Ydb()
+def generate_rooms():
+    # global rooms
+    rooms = {}
+    users=sql.select_query('user',where='id>1')
+    dateBack30day = time_epoch() - 2592000000 #30 дней
+    # logger.debug(f'{dateBack30day=}')   
+
+    for user in users:
+        messages = sql.select_query('all_user_dialog',where=f'id={user["id"]} AND time_epoch>{dateBack30day}')
+        for message in messages:
+            room_code = str(user['id'])
+            if room_code not in rooms:
+                new_room = {
+                    'members': 0,
+                    'messages': []
+                }
+                rooms[room_code] = new_room
+
+            message = {
+                "sender": user['id'],
+                "message": message['TEXT'].decode()
+            }
+            rooms[room_code]["messages"].append(message)
+    
+    # logger.debug(f'{rooms=}')
+    pprint(rooms)
+    return rooms
+
+rooms = generate_rooms()
 
 def generate_room_code(length: int, existing_codes: list[str]) -> str:
     while True:
@@ -166,7 +202,10 @@ def handle_message(payload):
         chatID = room
         text = payload["message"]
 
-        send_message_to_telegram(userID=chatID, message=text)
+        text = payload["message"]
+
+        # send_message_to_telegram(userID=chatID, message=text)
+        bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN')).send_message(chat_id=chatID, text=text)
         set_isSend()
 
     message = {
@@ -193,6 +232,8 @@ def handle_message(payload):
     # socketio.call()
     
 if __name__ == "__main__":
+    # rooms = generate_rooms()
+
     socketio.run(app, host='0.0.0.0', port='5004', debug=False)
     
     # socketio.run(app, host='0.0.0.0', ssl_context=('cert.pem','key.pem'),port='5004', debug=False)

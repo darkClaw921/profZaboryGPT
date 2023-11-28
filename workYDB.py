@@ -28,7 +28,7 @@ def truncate_string(string, max_length):
 
 intList = ['all_token', 'all_messages', 'time_epoh', 'token', 'stock_id','id'
            ,'num_order','strategia','user_id','strateg','deal_id','strategia',
-           'leadID']
+           'leadID','lead_id']
 
 floatList = ['token_price','amount','price_open',
               'price_insert','price_close','need_price_close','bb_bu',
@@ -277,7 +277,7 @@ class Ydb:
         print('rez',rez)
         return rez
 
-
+    
 def handler(event, context):
     return {
         'statusCode': 200,
