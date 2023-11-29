@@ -97,8 +97,8 @@ def prepare_answer_gpt(answerGPT):
     return ball, rez, good, bad, recomend
 @logger.catch
 def main():
-    # calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=4)), to_date=datetime.now(), first_time=1)   # return csv data
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=6)), to_date=(datetime.now() - timedelta(days=5)), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=0)), to_date=datetime.now(), first_time=1)   # return csv data
+    # calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=6)), to_date=(datetime.now() - timedelta(days=5)), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
     # logger.debug(f'{len(calls)}')
     # return 0 

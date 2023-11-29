@@ -126,8 +126,8 @@ class GPT():
       ]
     messages.extend(topic)
     completion = client.chat.completions.create(model=self.modelVersion,
-    messages=messages,
-    temperature=temp)
+        messages=messages,
+        temperature=temp)
     pprint(completion.choices[0].message.content)
     # pprint(completion.usage.total_tokens)
     totalToken = completion.usage.total_tokens
