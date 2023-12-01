@@ -29,7 +29,6 @@ gpt = GPT()
 GPT.set_key(os.getenv('KEY_AI'))
 bot = telebot.TeleBot(os.getenv('TELEBOT_TOKEN'))
 
-# class bot():
 
 # sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')s
 sql = workYDB.Ydb()

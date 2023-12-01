@@ -6,7 +6,10 @@ from workGS import Sheet
 from dataclasses import dataclass
 from chat import GPT
 from amocrmWork import get_leadID_from_contact
+from testLogg import logg
 load_dotenv()
+# /Users/igorgerasimov/Python/Bitrix/profZaboryGPT
+logger=logg('profZaboryGPT','sipuniWork')
 
 client_id = os.environ.get('SIPUNU_CLIENT_ID')
 secret_id = os.environ.get('SIPUNU_SECRET_ID')
@@ -95,19 +98,30 @@ def prepare_answer_gpt(answerGPT):
     bad = slice_str(answerGPT,'Плохо:','Рекомендации:')
     recomend = slice_str(answerGPT,'Рекомендации:','.')
     return ball, rez, good, bad, recomend
-@logger.catch
+
+# @logger.catch
 def main():
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=0)), to_date=datetime.now(), first_time=1)   # return csv data
-    # calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=6)), to_date=(datetime.now() - timedelta(days=5)), first_time=1)   # return csv data
+    # calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=0)), to_date=datetime.now(), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=(datetime.now() - timedelta(days=1)), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
     # logger.debug(f'{len(calls)}')
     # return 0 
     for call in calls:
         # pprint(call)
-        # try: 
+        try:
+            if call['Длительность звонка'] == '': continue
+        except KeyError:
+            continue
+
+        # if call['ID записи']== '1701158977.29346':
+            # pprint(call)
         if float(call['Длительность звонка']) >= 60:
-            print(f"{call['Длительность звонка']=} {call['ID записи']=}")
+            print(f"{call['Длительность звонка']=} {call['ID записи']=} {call['Откуда']=} {call['Схема']=} {call['Куда']=}")
+            pprint(call)
             phone = call['Откуда']
+            if call['\ufeffТип'] == 'Исходящий':
+                phone = call['Куда']
+            
             date = call['Время']
             assignedCRM = call['Ответственный из CRM']
             
@@ -116,9 +130,15 @@ def main():
             # isNew =True if call['Новый клиент']=='1' else False
             # if not isNew:
             #     continue
-            urlDeal = get_leadID_from_contact(phone)
+            try:
+                urlDeal = get_leadID_from_contact(phone)    
+            except StopIteration:
+                continue
+
             urlDeal = f'https://profzabor.amocrm.ru/leads/detail/{urlDeal}'
             logger.debug(urlDeal)
+
+
             try:
                 #TODO переделать на async
                 text = get_url_record(call['ID записи']) 
@@ -140,8 +160,11 @@ def main():
             ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
             print(answerGPT)
             lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone]
+            
             sheet.insert_cell(data=lst)
-                    
+
+
+
         # except Exception as e:
         #     logger.error(e)
         #     continue

@@ -12,17 +12,29 @@ from dotenv import load_dotenv
 load_dotenv()
 from openai import OpenAI
 import os
-key = os.environ.get('OPENAI_API_KEY')
-client = OpenAI(api_key=key)
+
 import tiktoken
 import sys
 from loguru import logger
 from pprint import pprint
+import httpx
 #import workGS
 #logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 #logger.add("file_1.log", rotation="50 MB")
 #sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','цены на дома 4.0 актуально ')
+key = os.environ.get('OPENAI_API_KEY')
+client = OpenAI(api_key=key,)
+# http_client=httpx.Client(
+#         proxies="socks5://91.149.222.52:1080",
+#         # transport=httpx.HTTPTransport(local_address="0.0.0.0"),
+#     ),)
 
+# client._proxies = {'https': 'socks5://127.0.0.0:8888'}
+# client._proxies = {'socks': '184.170.245.148:4145'}
+# client._proxies = {'socks': '127.0.0.0:8888'}
+
+# client._proxies = {'https': 'socks5://
+                   
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
