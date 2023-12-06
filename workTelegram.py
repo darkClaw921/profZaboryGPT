@@ -110,7 +110,7 @@ def say_welcome(message):
     global isSend
     username = message.from_user.username
     userID =  message.chat.id 
-    a = requests.post(f'{CHAT_ROOM_URL}/create/room/{userID}')
+    a = requests.post(f'{CHAT_ROOM_URL}/create/room/{userID}',timeout=1)
     logger.debug(a)
     isSend = True
 
@@ -123,7 +123,7 @@ def say_welcome(message):
     sql.replace_query('user', row)
     
     text = """Здравствуйте, я AI ассистент компании Проф заборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. Хотите я Вам расскажу про варианты комплектации ?"""
-    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {text}')
+    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {text}',timeout=1)
     clear_history(message.chat.id)
     add_message_to_history(userID, 'assistant', text)
     bot.send_message(message.chat.id, text, 
@@ -216,10 +216,10 @@ def callback_inline(callFull):
         logger.debug(f'{quest=}')
         typeQuest = payload.split('_')[2]
         listQuestions = TYPE_QUESTIONS[typeQuest]
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент: {call[1]}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент: {call[1]}',timeout=1)
 
         textAnswer=listQuestions[quest]['text']
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}') 
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1) 
         
         bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
         QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(call[1])
@@ -246,13 +246,13 @@ def any_message(message):
     logger.debug(payload)
     logger.debug(text)
     
-    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент:{text}')
+    a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент:{text}',timeout=1)
     # logger.debug(a)
     
         
     if text == 'Расчет':
         textAnswer = 'Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3.'
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         sql.set_payload(userID, 'quest_0')
 
         bot.send_message(userID,textAnswer,)
@@ -284,20 +284,20 @@ def any_message(message):
         numberZabor = COUNT_ZABOR_USER[userID]['real'] 
 
         textAnswer=f'Из какого материала будет {numberZabor}я часть?'
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
         return 0
     
     if payload == 'quest_last':
         textAnswer = 'Растояние от МКАД (км)'
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         sql.set_payload(userID, 'quest_end')
         bot.send_message(userID,textAnswer)
         return 0
     
     if payload == 'quest_end':
         textAnswer='Делаем расчет стоимости забора...'
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
 
         bot.send_message(userID,textAnswer)
         sql.set_payload(userID, 'exit')
@@ -316,11 +316,11 @@ def any_message(message):
         sheet.export_pdf(path)
         with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
             textAnswer='Вот предворительный расчет, после провери менеджер свяжется с вами и предоставит скидку'
-            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
             
             bot.send_message(userID,textAnswer)
             bot.send_document(userID, pdf_file)#filename='file.pdf')
-            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}', timeout=1)
         return 0
 
     if payload.startswith('quest'):
@@ -332,7 +332,7 @@ def any_message(message):
         listQuestions = TYPE_QUESTIONS[typeQuest]
         try:
             textAnswer=listQuestions[quest]['text']
-            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}', timeout=1)
             if textAnswer != 'Это конец вопросов секции':
                 bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
             else:
@@ -371,7 +371,7 @@ def any_message(message):
                 
             numberZabor = COUNT_ZABOR_USER[userID]['real'] 
             textAnswer=f'Из какого материала будет {numberZabor}я часть?' 
-            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}', timeout=1)
             bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
             
             
@@ -449,7 +449,7 @@ def any_message(message):
         textAnswer=answer
         
         if isSend:
-            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}', timeout=1)
             bot.send_message(message.chat.id, answer)
 
         add_message_to_history(userID, 'assistant', answer)
@@ -471,7 +471,7 @@ def any_message(message):
     textAnswer=answer
     
     if isSend:
-        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}', timeout=1)
         bot.send_message(message.chat.id, answer,  parse_mode='markdown')
     else: return 0
 
