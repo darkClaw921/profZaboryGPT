@@ -401,20 +401,8 @@ def any_message(message):
 
         return 0 
 
-    if check_time_last_message(userID) == False: return 0
+    # if check_time_last_message(userID) == False: return 0
     # if not isSend: return 0
-
-    if payload == 'addmodel':
-        text = text.split(' ')
-        rows = {'model': text[1], 'url': text[0] }
-        sql.replace_query('model',rows)
-        return 0
-    
-    if payload == 'addpromt':
-        text = text.split(' ')
-        rows = {'promt': text[1], 'url': text[0] }
-        sql.replace_query('prompt',rows)
-        return 0
     
     
     add_message_to_history(userID, 'user', text)
