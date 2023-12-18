@@ -66,20 +66,51 @@ def get_url_record(fileID:str):
     response = requests.get(downloadURL)
     # response.raise_for_status() # вызывает исключение, если возникла ошибка при загрузке файла
     # fileName=f'{fileID}'
+    # fileName = '/Users/igorgerasimov/Downloads/audio1492119703.mp3'
     fileName=f'{fileID}.mp3'
+    # fileName=f'{fileID}.ogg'
     # text = voice_processing(filename=fileName, response=response)
     # # logger.debug(f'{text}')
     with open(fileName, "wb") as file:
         file.write(response.content)
     
-
+    # fileName = 'audio1492119703.mp3'
     upload_file(fileName, bytes)
     print("Файл успешно загружен") 
     text = get_text_record(fileName)
-    
+    print(text)
+    with open('textPrepare', "w") as file:
+        file.write(text)
     # with open(f'{fileID}.txt', "w") as file:
     #     file.write(text) 
     os.remove(fileName)
+    return text
+
+def get_url_record_local(fileID:str):
+    import requests
+    # downloadURL = client.get_record(fileID)   
+    # bytes = client.get_record(fileID)   
+    # response = requests.get(downloadURL)
+    # response.raise_for_status() # вызывает исключение, если возникла ошибка при загрузке файла
+    # fileName=f'{fileID}'
+    fileName = '/Users/igorgerasimov/Downloads/audio1492119703-3.mp3'
+    # fileName=f'{fileID}.mp3'
+    # fileName=f'{fileID}.ogg'
+    # text = voice_processing(filename=fileName, response=response)
+    # # logger.debug(f'{text}')
+    # with open(fileName, "wb") as file:
+    #     file.write(response.content)
+    
+    # fileName = 'audio1492119703.mp3'
+    upload_file(fileName, bytes)
+    print("Файл успешно загружен") 
+    text = get_text_record(fileName)
+    print(text)
+    with open('textPrepare', "w") as file:
+        file.write(text)
+    # with open(f'{fileID}.txt', "w") as file:
+    #     file.write(text) 
+    # os.remove(fileName)
     return text
 
 def slice_str(s:str,start:str, end:str):
@@ -175,6 +206,8 @@ def main():
 if __name__ == '__main__':
     # a = sheet.get_cell(6,3)
     # text='Алло\nЗдравствуйте компания вопрос забора вы заявочку оставляли на расчет удобно пообщаться\nЕсли меня слышно то удобно\nВчера актуальная тема для вас на этот год планируете или на следующий\nНет вот в течение недели 2 планирую\nДавайте примерно сориентирую по ценам вот эти 30 м 1 и 8 высота одностороннее покрытие без ворот без калитки все вместе под ключ обойдется 76 200\nПримерно 30 32 м профнастил\nАвтомобильские или механические страницы\nНе знаю\nСегодня будем переезжать вот ну примерно 3,5 там не было\nВорота откатные механические если с обшивкой из профлиста в районе 85 с автоматикой 120 где то выходит\nВот так более детально замерщик выезжает с образцами с ним уже по месту можно все обсудить если вместе будете заказывать то тогда дешевле сделаю\nЕсли вместе то ошибка профлист нужна или какой материал\nОбшивка профлист нужна или какой материал\nАлло\nАлло вас не слышно\n'
+    # get_url_record_local('1701158977.29346')
+    # 1/0
     text='ты кто?'
     answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
     logger.debug(answerGPT) 
