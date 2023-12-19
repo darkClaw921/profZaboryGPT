@@ -10,7 +10,7 @@ import json
 from loguru import logger
 import sys
 from createKeyboard import *
-from workBitrix import *
+# from workBitrix import *
 from helper import *
 from workGDrive import *
 from telebot.types import InputMediaPhoto
@@ -114,7 +114,11 @@ def say_welcome(message):
     logger.debug(a)
     isSend = True
 
-    # lead_id = create_lead(userName=username, userID=userID)
+    row = {
+        ''
+    }
+    lead_id = create_lead(userName=username, userID=userID)
+    
     lead_id =0
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)

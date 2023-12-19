@@ -39,7 +39,7 @@ from amocrm.v2 import Contact as _Contact, Company, Lead as _Lead, custom_field,
 class Lead(_Lead):
     record_text = custom_field.TextAreaCustomField("record text")
     # noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
-    urlChatRoom = custom_field.UrlCustomField('чат с клиентом',code='1346015')
+    urlChatRoom = custom_field.UrlCustomField('Чат с клиентом',code='776947')
     # phone1 = custom_field.ContactPhoneField('phone')
 
 
@@ -53,7 +53,7 @@ def create_lead(userName, userID):
     lead = Lead()
     lead.name = f'Клиент {userName} из Telegram'
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
-    lead.urlChatRoom = f'https://8bf5-178-234-10-41.ngrok-free.app/room/{userID}'
+    lead.urlChatRoom = f'http://64.226.97.140:5005/room/{userID}'
     lead.save()
     # Lead.create(name=userName)
     # Lead.save()
@@ -94,7 +94,7 @@ if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')
     a = get_leadID_from_contact('79636201537')
     print(a)
-    # create_lead('igor',12414245)
+    create_lead('igor',12414245)
     # a = check_need_answered_for(leadID=435263)
     # print(a)
     # lead.record_text = 'text'
