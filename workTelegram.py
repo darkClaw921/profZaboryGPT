@@ -342,6 +342,7 @@ def any_message(message):
             bot.send_message(userID,textAnswer)
             bot.send_document(userID, pdf_file)#filename='file.pdf')
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}', timeout=1)
+            add_message_to_history(userID,'assistant','КЛИЕНТ УЖЕ СДЕЛАЛ РАСЧЕТ В КАЛЬКУЛЯТОРЕ, больше не предлагать')
         return 0
 
     if payload.startswith('quest'):
