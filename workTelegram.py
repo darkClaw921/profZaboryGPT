@@ -265,7 +265,11 @@ def any_message(message):
         # a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
         return 0
     if text == 'Консультация':
-        1+0
+        textAnswer = 'Какой забор вас интересует?'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
+        # sql.set_payload(userID, 'quest_0')
+        bot.send_message(userID,textAnswer,)
+        add_message_to_history(userID, 'assistant', textAnswer)
 
     if payload == 'quest_0':
         sql.set_payload(userID, 'quest_1') 
