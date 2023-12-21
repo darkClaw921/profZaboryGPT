@@ -26,7 +26,8 @@ def get_text_record(fileName:str):
         "config": {
             "specification": {
                 'audioEncoding': 'MP3',
-                "languageCode": "ru-RU"
+                # "languageCode": "ru-RU"
+                "languageCode": "en-EN"
             }
         },
         "audio": {

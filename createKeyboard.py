@@ -15,8 +15,8 @@ def create_inlinekeyboard_is_row(rows: dict):
 
 def create_menu_keyboard():
     keyboard = telebot.types.ReplyKeyboardMarkup(True)
-    keyboard.row('Расчет')
-    # keyboard.row('calc')
+    keyboard.row('Калькулятор')
+    keyboard.row('Консультация')
 
     #keyboard.row('Подборка домов')
     return keyboard
