@@ -120,6 +120,20 @@ def prepare_dict_keyboadr(dic)->str:
         st += f'{key}. {value}\n'
     return st
 
+
+def find_phone_numbers(text):
+    pattern = r'(\+?\d{1,2}\s?[-(]?\d{3}[-)]?\s?\d{3}\s?[-]?\s?\d{2}\s?[-]?\s?\d{2})'
+    phone_numbers = re.findall(pattern, text)
+    result = []
+    for num in phone_numbers:
+        number = num.replace("-", "").replace(' ','').replace('(','').replace(')','')
+        if len(number) == 11 and num[0] != '8':
+            number = '+' + number
+        elif len(number) == 10:
+            number = '+7' + number
+        result.append(number)
+        
+    return result
         
 #Google Sheet
 @logger.catch

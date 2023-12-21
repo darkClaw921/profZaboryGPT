@@ -255,6 +255,13 @@ def any_message(message):
     # logger.debug(a)
     
         
+    phone = find_phone_numbers(text)
+    if phone != []:
+        textAnswer = 'Спасибо, передал менеджеру'
+        a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
+        bot.send_message(userID,textAnswer)
+        return 0
+
     if text == 'Калькулятор':
         textAnswer = 'Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3.'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
@@ -264,6 +271,7 @@ def any_message(message):
         COUNT_ZABOR_USER[userID]=0
         # a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}')
         return 0
+    
     if text == 'Консультация':
         textAnswer = 'Какой забор вас интересует?'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
