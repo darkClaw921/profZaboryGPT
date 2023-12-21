@@ -66,6 +66,7 @@ questionGridRabit = {
     '3': {'text': 'Количество протяжек арматуры:',
         'keyboard':create_inlinekeyboard_is_row({'1 протяжка':'GridRabit_1', 
                                                  '2 протяжки':'GridRabit_2',                                                
+                                                 'Без протяжек':'GridRabit_0',                                                
                                                  })},
 
     '4': {'text': 'Количество ворот',
@@ -153,13 +154,27 @@ questionEvroShtak = {
                                                  'Имитация дерева/односторонняя':'evroShtak_woodOdnostoronee',
                                                  'Имитация дерева/двухсторонняя':'evroShtak_woodDvystoronee',
                                                  })},
+    '5': {'text': 'Выберите зазор:',
+        'keyboard':create_inlinekeyboard_is_row({'0':'evroShtak_0', 
+                                                    '1':'evroShtak_1',
+                                                    '2':'evroShtak_2',
+                                                    '3':'evroShtak_3',
+                                                    '4':'evroShtak_4',
+                                                    '5':'evroShtak_5',
+                                                    '6':'evroShtak_6',
+                                                    '7':'evroShtak_7',
+                                                    '8':'evroShtak_8',
+                                                    '9':'evroShtak_9',
+                                                    '10':'evroShtak_10',
+                                                    })},
 
-    '5': {'text': 'Количество ворот',
+
+    '6': {'text': 'Количество ворот',
         'keyboard': None},
     
-    '6': {'text': 'Количество калиток',
+    '7': {'text': 'Количество калиток',
         'keyboard': None},
 
-    '7': {'text': LAST_QUESTION,
+    '8': {'text': LAST_QUESTION,
         'keyboard': None},
 }

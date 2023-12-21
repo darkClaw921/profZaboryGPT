@@ -204,10 +204,11 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('Z8', pokrytie[str(values[4])])
         # sheet.send_cell('Z6', str(values[3]))
         # sheet.send_cell('Z8', str(values[4]))
-        sheet.send_cell('Z16', values[5])
-        sheet.send_cell('Z23', values[6])
+        sheet.send_cell('Z10', values[5])# зазор
+        sheet.send_cell('Z16', values[6])
+        sheet.send_cell('Z23', values[7])
         try:
-            sheet.send_cell('C170', values[7])
+            sheet.send_cell('C170', values[8])
         except:
             1+0
 
@@ -219,8 +220,9 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('AH3', str(values[2]).replace('.',','))
         sheet.send_cell('AH6', porydok(str(values[3])))
         sheet.send_cell('AH8', pokrytie[str(values[4])])
-        sheet.send_cell('AH16', values[5])
-        sheet.send_cell('AH23', values[6])
+        sheet.send_cell('AH10', values[5])# зазор
+        sheet.send_cell('AH16', values[6])
+        sheet.send_cell('AH23', values[7])
 
     if typeMaterial == 'evroShtak3':
         print('отправка значений ' + typeMaterial)
@@ -230,8 +232,9 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
         sheet.send_cell('AP3', str(values[2]).replace('.',','))
         sheet.send_cell('AP6', porydok(str(values[3])))
         sheet.send_cell('AP8', pokrytie[str(values[4])])
-        sheet.send_cell('AP16', values[5])
-        sheet.send_cell('AP23', values[6])
+        sheet.send_cell('AP10', values[5])# зазор
+        sheet.send_cell('AP16', values[6])
+        sheet.send_cell('AP23', values[7])
     
     if typeMaterial == 'GridRabit1':
         print('отправка значений ' + typeMaterial)

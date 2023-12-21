@@ -251,8 +251,9 @@ def any_message(message):
     logger.debug(payload)
     logger.debug(text)
     
+    
     a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент:{text}',timeout=1)
-    # logger.debug(a)
+    
     
         
     phone = find_phone_numbers(text)
@@ -263,7 +264,9 @@ def any_message(message):
         return 0
 
     if text == 'Калькулятор':
-        textAnswer = 'Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3.'
+        textAnswer = """Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3. \n
+- указывайте длину забора с учетом ширины ворот и калиток
+- если во время или после расчета у вас останутся вопросы по комплектации забора, оставляйте свой номер телефона, менеджер свяжется, проконсультирует и посчитает более точно"""
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         sql.set_payload(userID, 'quest_0')
 
@@ -273,7 +276,7 @@ def any_message(message):
         return 0
     
     if text == 'Консультация':
-        textAnswer = 'Какой забор вас интересует?'
+        textAnswer = 'Я считаю себя экспертом в заборостроении и готов помочь вам ответить на вопросы в этой сфере! Задавайте)'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         # sql.set_payload(userID, 'quest_0')
         bot.send_message(userID,textAnswer,)
@@ -283,7 +286,8 @@ def any_message(message):
     if payload == 'quest_0':
         sql.set_payload(userID, 'quest_1') 
         try:
-            COUNT_ZABOR_USER[userID]['real'] += 1  
+            COUNT_ZABOR_USER[userID]['real'] += 1 
+
         except Exception as e :
             logger.debug(f'{e=}')
             COUNT_ZABOR_USER.setdefault(userID, {'max':int(text),
@@ -294,12 +298,12 @@ def any_message(message):
                                                  '3d':1,
                                                  'Zaluzi':1})
             COUNT_ZABOR_USER[userID] = {'max':int(text),
-                                                 'real': 1,
-                                                 'profNastil': 1,
-                                                 'evroShtak':1,
-                                                 'GridRabit':1,
-                                                 '3d':1,
-                                                 'Zaluzi':1}
+                                        'real': 1,
+                                        'profNastil': 1,
+                                        'evroShtak':1,
+                                        'GridRabit':1,
+                                        '3d':1,
+                                        'Zaluzi':1}
             
         numberZabor = COUNT_ZABOR_USER[userID]['real'] 
 
@@ -318,7 +322,7 @@ def any_message(message):
     if payload == 'quest_end':
         textAnswer='Делаем расчет стоимости забора...'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
-
+        # bot.send_message(userID,QUESTS_USERS[userID])
         bot.send_message(userID,textAnswer)
         sql.set_payload(userID, 'exit')
         # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')
@@ -336,13 +340,21 @@ def any_message(message):
         sheet.export_pdf(path)
         with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
             # textAnswer='Вот предворительный расчет, после проверки менеджер свяжется с вами и предоставит скидку'
-            textAnswer='Стоимость в этом расчете действительна в течении 1 недели. Оставьте свой номер телефона, менеджер свяжется с Вами и согласует дату и время замера'
+            textAnswer='Стоимость со СКИДКОЙ в этом расчете действительна в течении 1 недели. Оставьте свой номер телефона, менеджер свяжется с Вами и согласует дату и время замера'
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
             
             bot.send_message(userID,textAnswer)
             bot.send_document(userID, pdf_file)#filename='file.pdf')
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}', timeout=1)
             add_message_to_history(userID,'assistant','КЛИЕНТ УЖЕ СДЕЛАЛ РАСЧЕТ В КАЛЬКУЛЯТОРЕ, больше не предлагать')
+            COUNT_ZABOR_USER[userID] = {'max':int(text),
+                                        'real': 1,
+                                        'profNastil': 1,
+                                        'evroShtak':1,
+                                        'GridRabit':1,
+                                        '3d':1,
+                                        'Zaluzi':1}
+            QUESTS_USERS[userID] = {}
         return 0
 
     if payload.startswith('quest'):
@@ -581,15 +593,15 @@ if __name__ == '__main__':
     #PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
     
     #TODO
-    sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
-    # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
-    logger.debug('sheet загружена')
-    a = sheet.get_rom_value(1)
-    logger.debug('a загружена')
+    # sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
+    # # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
+    # logger.debug('sheet загружена')
+    # a = sheet.get_rom_value(1)
+    # logger.debug('a загружена')
     #TODO
-    CHECK_WORDS = sheet.get_words_and_urls()
-    logger.debug('CHECK_WORDS загружена')
-    # # check_time_last_message(400923372)
+    # CHECK_WORDS = sheet.get_words_and_urls()
+    # logger.debug('CHECK_WORDS загружена')
+    # # # check_time_last_message(400923372)
 
     print(f'[OK]')
     bot.infinity_polling()
