@@ -140,13 +140,6 @@ questionEvroShtak = {
                                                  'Шахматный':'evroShtak_chees',
                                             
                                                  })},
-    # '3': {'text': 'Выберите толщину:',
-    #     'keyboard':create_inlinekeyboard_is_row({'0.3mm':'evroShtak_0.3', 
-    #                                              '0.35mm':'evroShtak_0.35',
-    #                                              '0.4mm':'evroShtak_0.4',
-    #                                              '0.45mm':'evroShtak_0.45',
-    #                                              '0.5mm':'evroShtak_0.5',
-    #                                              })},
 
     '4': {'text': 'Выберите покрытие:',
         'keyboard':create_inlinekeyboard_is_row({'Одностороннее':'evroShtak_odnostoronee', 
@@ -178,3 +171,4 @@ questionEvroShtak = {
     '8': {'text': LAST_QUESTION,
         'keyboard': None},
 }
+

@@ -40,6 +40,7 @@ class Lead(_Lead):
     record_text = custom_field.TextAreaCustomField("record text")
     # noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
     urlChatRoom = custom_field.UrlCustomField('Чат с клиентом',code='776947')
+    trafickPath = custom_field.TextAreaCustomField('Источник трафика',code='317031')
     # phone1 = custom_field.ContactPhoneField('phone')
 
 
@@ -50,13 +51,26 @@ class Contact(_Contact):
 
 def create_lead(userName, userID):
     # data = {'name'}
+
     lead = Lead()
     lead.name = f'Клиент {userName} из Telegram'
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
     lead.urlChatRoom = f'http://64.226.97.140:5005/room/{userID}'
-    lead.save()
+    lead.trafickPath = 'Telegram'
+    leadID = lead.save()
+    return leadID
     # Lead.create(name=userName)
     # Lead.save()
+
+def create_contact(userName, phone:str):
+    # data = {'name'}
+    contact = Contact()
+    # contact.name = f'Клиент {userName} из Telegram'
+    contact.name = f'userName'
+    contact.phone= phone
+    # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
+    contactID = contact.save()
+    return contactID
 
 def get_leadID_from_contact(phone:str):
     conta = Contact.objects.get(query=phone)
@@ -66,18 +80,20 @@ def get_leadID_from_contact(phone:str):
     # lead = Lead.objects.get(f'{leadID}')
 
 
-def update_lead(phone:str, text:str):
+def update_lead(leadID, contactID):
 
     # conta = Contact.objects.get(query='89308316687')
-    conta = Contact.objects.get(query=phone)
+    # conta = Contact.objects.get(query=phone)
     # leadID = conta.leads._data[0]['id']
-    leadID = conta.leads._data[0]['id']
+    # leadID = conta.leads._data[0]['id']
     lead = Lead.objects.get(f'{leadID}')
     # print(lead)
 
     # lead.lead_card_budget=12448222
     # lead.record_text = """Менеджер провел успешный разговор с клиентом, который интересуется установкой забора между соседями. Он предложил разные варианты и предоставил информацию о материалах и ценах.
-    lead.record_text = text
+    
+    lead.contacts = [contactID]
+    # lead.record_text = text
     lead.save()
 
 def check_need_answered_for(leadID:int):

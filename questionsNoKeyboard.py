@@ -2,107 +2,170 @@
 import workYDB 
 from createKeyboard import *
 
-pokrytie = {1:'Одностороннее', 
-        2:'Двухстороннее',
-        3:'Оцинкованное',
-        4:'Имитация дерева/односторонняя',
-        5:'Имитация дерева/двухсторонняя',
+pokrytie = {'odnostoronee':'Одностороннее', 
+        'dvystoronee':'Двухстороннее',
+        'otsincovonoe':'Оцинкованное',
+        'woodOdnostoronee':'Имитация дерева/односторонняя',
+        'woodDvystoronee':'Имитация дерева/двухсторонняя',
     }
-porydok = {1:'Обычный', 
-        2:'Шахматный',
+porydok = {'normal':'Обычный', 
+        'chees':'Шахматный',
     }
-
+LAST_QUESTION = 'Это конец вопросов секции'
 questionProfNastil = {
-    1: {'text':'Общая длина забора',
+    '1': {'text':'Длина (m)',
         'keyboard': None},
     
-    2: {'text':'Высота забора',
-          'keyboard':{1:'1.5m', 
-                    2:'1.8m',
-                    3:'2m',
-                    4:'2.2m',
-                    5:'2.5m',
-                    6:'3m',
+    '2': {'text':'Высота (m)',
+          'keyboard':{'1.5':'profNastil_0', 
+                    '1.8':'profNastil_1',
+                    '2':'profNastil_2',
+                    '2.2':'profNastil_3',
+                    '2.5':'profNastil_4',
+                    '3':'profNastil_5',
                     }},
     
-    3: {'text': 'Выберите толщину:',
-        'keyboard':{1:'0.3mm', 
-                    2:'0.35mm',
-                    3:'0.4mm',
-                    4:'0.45mm',
-                    5:'0.5mm',
+    '3': {'text': 'Выберите толщину (mm)',
+        'keyboard':{'0.3':'profNastil_0', 
+                    '0.35':'profNastil_1',
+                    '0.4':'profNastil_2',
+                    '0.45':'profNastil_3',
+                    '0.5':'profNastil_4',
                     }},
-    4: {'text': 'Выберите покрытие:',
-        'keyboard':{1:'Одностороннее', 
-                    2:'Двухстороннее',
-                    3:'Оцинкованное',
-                    4:'Имитация дерева/односторонняя',
-                    5:'Имитация дерева/двухсторонняя',
+    '4': {'text': 'Выберите покрытие:',
+        'keyboard':{'Одностороннее':'profNastil_0', 
+                    'Двухстороннее':'profNastil_1',
+                    'Оцинкованное':'profNastil_2',
+                    'Имитация дерева/односторонняя':'profNastil_3',
+                    'Имитация дерева/двухсторонняя':'profNastil_4',
                     }},
 
-    5: {'text': 'Количество ворот',
+    '5': {'text': 'Количество ворот',
         'keyboard': None},
     
-    6: {'text': 'Количество калиток',
+    '6': {'text': 'Количество калиток',
         'keyboard': None},
 
-    7: {'text': 'Расстояние от МКАД',
+    '7': {'text': LAST_QUESTION,
         'keyboard': None},
-        #пустой закрывающий влпрос 
-    8: {'text': 'Расстояние от МКАД',
+}
+
+questionGridRabit = {
+    '1': {'text':'Длина (m)',
+        'keyboard': None},
+    
+    '2': {'text':'Высота (m)',
+          'keyboard':{'1.5':'GridRabit_0', 
+                    '1.8':'GridRabit_1',
+                    '2':'GridRabit_2',
+                    }},
+    
+    '3': {'text': 'Количество протяжек арматуры:',
+        'keyboard':{'1':'GridRabit_0', 
+                    '2':'GridRabit_1',                                                
+                    '0':'GridRabit_2',                                                
+                    }},
+
+    '4': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '5': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    '6': {'text': LAST_QUESTION,
+        'keyboard': None},
+}
+
+question3d = {
+    '1': {'text':'Длина (m)',
+        'keyboard': None},
+    
+    '2': {'text':'Высота (m)',
+          'keyboard':{'1.53':'3d_0', 
+                    '1.73':'3d_1',
+                    '2.03':'3d_2',
+                    }},
+
+    '3': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '4': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    # '5': {'text': 'Расстояние от МКАД',
+    '5': {'text': LAST_QUESTION,
+        'keyboard': None},
+}
+
+questionZaluzi = {
+    '1': {'text':'Длина (m)',
+        'keyboard': None},
+    
+    '2': {'text':'Высота (m)',
+          'keyboard':{'1.5':'Zaluzi_0', 
+                    '1.8':'Zaluzi_1',
+                    '2':'Zaluzi_2',
+                    '2.2':'Zaluzi_3',
+                    '2.5':'Zaluzi_4',
+                    }},
+
+    '3': {'text': 'Количество ворот',
+        'keyboard': None},
+    
+    '4': {'text': 'Количество калиток',
+        'keyboard': None},
+
+    '5': {'text': LAST_QUESTION,
         'keyboard': None},
 }
 
 questionEvroShtak = {
-    1: {'text':'Общая длина забора',
+    '1': {'text':'Длина (m)',
         'keyboard': None},
     
-    2: {'text':'Высота забора',
-          'keyboard':{1:'1.5m', 
-                        2:'1.8m',
-                        3:'2m',
-                        4:'2.2m',
-                        5:'2.5m',
-                        6:'3m',
-                        }},
-    
-    3: {'text': 'Порядок штакетин в заборе из евроштакетника:',
-        'keyboard':{1:'Обычный', 
-                    2:'Шахматный',
+    '2': {'text':'Высота (m)',
+          'keyboard':{'1.5':'evroShtak_0', 
+                    '1.8':'evroShtak_1',
+                    '2':'evroShtak_2',
+                    '2.2':'evroShtak_3',
+                    '2.5':'evroShtak_4',
+                #  '3m':'evroShtak_3',
                     }},
-    # '3': {'text': 'Выберите толщину:',
-    #     'keyboard':create_inlinekeyboard_is_row({'0.3mm':'evroShtak_0.3', 
-    #                                              '0.35mm':'evroShtak_0.35',
-    #                                              '0.4mm':'evroShtak_0.4',
-    #                                              '0.45mm':'evroShtak_0.45',
-    #                                              '0.5mm':'evroShtak_0.5',
-    #                                              })},
-
-    4: {'text': 'Выберите покрытие:',
-        'keyboard':{1:'Одностороннее', 
-                    2:'Двухстороннее',
-                    3:'Имитация дерева/односторонняя',
-                    4:'Имитация дерева/двухсторонняя',
+    
+    '3': {'text': 'Порядок штакетин в заборе из евроштакетника:',
+        'keyboard':{'Обычный':'evroShtak_0', 
+                    'Шахматный':'evroShtak_1',
                     }},
 
-    5: {'text': 'Количество ворот',
+    '4': {'text': 'Выберите покрытие:',
+        'keyboard':{'Одностороннее':'evroShtak_0', 
+                    'Двухстороннее':'evroShtak_1',
+                    'Имитация дерева/односторонняя':'evroShtak_2',
+                    'Имитация дерева/двухсторонняя':'evroShtak_3',
+                    }},
+    '5': {'text': 'Выберите зазор (mm)',
+        'keyboard':{'0':'evroShtak_0', 
+                    '1':'evroShtak_1',
+                    '2':'evroShtak_2',
+                    '3':'evroShtak_3',
+                    '4':'evroShtak_4',
+                    '5':'evroShtak_5',
+                    '6':'evroShtak_6',
+                    '7':'evroShtak_7',
+                    '8':'evroShtak_8',
+                    '9':'evroShtak_9',
+                    '10':'evroShtak_10',
+                    }},
+
+    '6': {'text': 'Количество ворот',
         'keyboard': None},
     
-    6: {'text': 'Количество калиток',
+    '7': {'text': 'Количество калиток',
         'keyboard': None},
 
-    7: {'text': 'Расстояние от МКАД',
+    '8': {'text': LAST_QUESTION,
         'keyboard': None},
-    #пустой закрывающий влпрос 
-    8: {'text': 'Расстояние от МКАД',
-        'keyboard': None},
-}
-questionTypeMaterial = {
-    1: 'Профнастил',
-    2: 'Евроштакетник',
 }
 
-questionTypeMaterialEN = {
-    1: 'profNastil',
-    2: 'evroShtak',
-}
+keys = list(questionProfNastil['2']['keyboard'].keys())
+print(keys[0])

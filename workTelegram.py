@@ -16,13 +16,15 @@ from workGDrive import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
-from questions import *
+
 import requests
-from amocrmWork import create_lead
+from amocrmWork import create_lead, create_contact, update_lead
 
 load_dotenv()
 isDEBUG = True
 isSend = True
+isNeedKeyboard = True
+
 logger.add(sys.stderr, format="{time} {level} {message}", level="INFO")
 logger.add("file_1.log", rotation="50 MB")
 gpt = GPT()
@@ -35,7 +37,8 @@ sql = workYDB.Ydb()
 
 CHAT_ROOM_URL = os.environ.get('CHAT_ROOM_URL')
 
-
+# from questions import * #для сервисов где есть клавиатуры
+from questionsNoKeyboard import * #для сервисов где нет клавиатур
 TYPE_QUESTIONS = {'profNastil': questionProfNastil,
                   'evroShtak':questionEvroShtak,
                   'GridRabit':questionGridRabit,
@@ -117,17 +120,21 @@ def say_welcome(message):
     row = {
         ''
     }
+    
     lead_id = create_lead(userName=username, userID=userID)
     
-    lead_id =0
+    # lead_id =0
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}
     row = {'id': message.chat.id, 'model': 'model1', 'promt': 'promt1','nicname':username, 'payload': '','lead_id':lead_id}
     sql.replace_query('user', row)
     
-    text = """Здравствуйте, я AI ассистент компании ПрофЗаборы. Я отвечу на Ваши вопросы по поводу строительства заборов 😁. 
-Если Вы хотите, что бы я Вам рассказал про варианты комплектации, то нажмите на кнопку "Консультация". Если у Вас есть все параметры вашего забора и вы хотите посчитать стоимость, то выберите "Калькулятор"""
+    text = """Здравствуйте, я AI ассистент компании ПрофЗаборы. Я отвечу на Ваши вопросы по теме строительства заборов 😁
+
+Если Вы хотите, что бы я Вам рассказал про варианты комплектации, как подобрать подходящий забор и другое, то нажмите на кнопку «Консультация»👨‍🏫
+
+Если у Вы уже определились какой забор вам нужен и хотите посчитать стоимость, то выберите «Калькулятор» 🧮"""
     a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {text}',timeout=1)
     clear_history(message.chat.id)
     add_message_to_history(userID, 'assistant', text)
@@ -214,19 +221,35 @@ def callback_inline(callFull):
 
         bot.answer_callback_query(callFull.id)
         return 0
+    
     if call[0] in ['profNastil','evroShtak', 'GridRabit', '3d', 'Zaluzi']: 
     # if call[0] == 'profNastil' or call[0] == 'evroShtak':    
         payload = sql.get_payload(userID)
         quest = str(int(payload.split('_')[1]))
         logger.debug(f'{quest=}')
-        typeQuest = payload.split('_')[2]
+        # typeQuest = payload.split('_')[2]
+        typeQuest = call[0]
         listQuestions = TYPE_QUESTIONS[typeQuest]
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Клиент: {call[1]}',timeout=1)
 
         textAnswer=listQuestions[quest]['text']
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1) 
+       
+        if isNeedKeyboard:
+            keyboard = create_inlinekeyboard_is_row(listQuestions[quest]['keyboard']) if listQuestions[quest]['keyboard'] != None else None
+            bot.send_message(userID,listQuestions[quest]['text'],reply_markup=keyboard)
+        else:
+            quests = listQuestions[quest]['keyboard'].keys()
+            if quests != None:   
+                quests = quests.keys() 
+                text = '\n'
+                for rang,i in enumerate(quests):
+                    text +=f'{rang} -> '+ i + '\n'
+                quests= text
+            else:
+                quests = ''
+            bot.send_message(userID,listQuestions[quest]['text']+ '\n' + quests)
         
-        bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
         QUESTS_USERS[userID][COUNT_ZABOR_USER[userID]['real']-1].append(call[1])
         sql.set_payload(userID, f'quest_{int(quest)+1}_{typeQuest}')
         bot.answer_callback_query(callFull.id)
@@ -261,12 +284,24 @@ def any_message(message):
         textAnswer = 'Спасибо, передал менеджеру'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         bot.send_message(userID,textAnswer)
+        
+        contactID = create_contact(userName=username,phone=phone[0])
+        leadID=sql.get_leadID(userID)
+        update_lead(leadID=leadID,contactID=contactID)
         return 0
 
     if text == 'Калькулятор':
-        textAnswer = """Сколько разных видов материалов будет использоваться в заборе? Введите число от 1 до 3. \n
-- указывайте длину забора с учетом ширины ворот и калиток
-- если во время или после расчета у вас останутся вопросы по комплектации забора, оставляйте свой номер телефона, менеджер свяжется, проконсультирует и посчитает более точно"""
+        textAnswer = """Я могу предварительно посчитать стоимость 5 видов металлических заборов (из профнастила, из евроштакетника, из сетки-рабицы, 3D забор и жалюзи) с воротами и калитками.
+
+📜Прочтите инструкцию по работе с калькулятором:
+
+〰️ Указывайте длину частей забора с учетом ширины ворот и калиток.
+〰️ Если во время или после расчета у вас останутся вопросы по комплектации забора, оставляйте свой номер телефона, менеджер свяжется, проконсультирует и посчитает более точно
+〰️ В процессе подсчета я вам задам несколько вопросов, выбирайте подходящий вариант или вписывайте числа.
+
+В одной смете предлагаем выбрать до 3х вариантов заборов - это может быть 3 разных вида по материалу (пример: 30 метров профнастила, 30 метров евроштакетника и 30 метров жалюзи) или по одному из других параметров (например: 20 метров профнастила высотой 1,8 метра + 20 метров евроштакетника в обычном порядке + 10 метров евроштакетника в шахматном порядке)
+
+Итак, выберите число от 1 до 3, из скольки частей будет состоять ваш забор?"""
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         sql.set_payload(userID, 'quest_0')
 
@@ -332,15 +367,40 @@ def any_message(message):
             pprint(QUESTS_USERS[userID])
             typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
             print(f'{typeQuest1=}')
-            path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
+            # path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
+            path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
             COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
         sheet = Sheet('GDtxt.json',path,get_worksheet=1)
         sheet.export_pdf(path)
+        
+        sheet = Sheet('GDtxt.json',path,get_worksheet=3) 
+        a= sheet.find_cell('Скидка')
+        sheetSale = sheet.get_rom_value(a.row)[-1]
+        nowDate, futureDate = get_dates(7, '%d-%m')
+        
         with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
             # textAnswer='Вот предворительный расчет, после проверки менеджер свяжется с вами и предоставит скидку'
-            textAnswer='Стоимость со СКИДКОЙ в этом расчете действительна в течении 1 недели. Оставьте свой номер телефона, менеджер свяжется с Вами и согласует дату и время замера'
+            textAnswer=f"""🎉 Итого стоимость забора «под ключ» смотрите в прикрепленном pdf файле
+
+Получите 🏷️скидку: {sheetSale} руб. при обращении к нашему менеджеру (действует до {futureDate})
+---------------------------------------------
+
+🤖 я считает достаточно точно, но
+
+✔️если у Вас более сложный расчет
+✔️или хотите воспользоваться спецпредложениями
+
+то пишите нашему менеджеру сейчас
+---------------------------------------------
+🏆Спецпредложения, которые действуют до конца этой недели:
+
+✚ПРЕДОПЛАТА🏷️ всего от 10%
+✚бутирование щебнем в лунку диаметром 90 мм в ПОДАРОК🎁
+✚закрепление🖇️ стоимости (металл может дорожать еженедельно) 
+---------------------------------------------
+✔️Воспользуйтесь предложением, напишите менеджеру и оформите выезд специалиста на участок. Закрепите цену забора на замере (возможен выезд «день в день») и ожидайте бригаду от 2х дней."""
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
             
             bot.send_message(userID,textAnswer)
@@ -368,7 +428,25 @@ def any_message(message):
             textAnswer=listQuestions[quest]['text']
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}', timeout=1)
             if textAnswer != 'Это конец вопросов секции':
-                bot.send_message(userID,listQuestions[quest]['text'],reply_markup=listQuestions[quest]['keyboard'])
+                
+                if isNeedKeyboard:
+                    keyboard = create_inlinekeyboard_is_row(listQuestions[quest]['keyboard']) if listQuestions[quest]['keyboard'] != None else None
+                    bot.send_message(userID,listQuestions[quest]['text'],reply_markup=keyboard)
+                else:
+                    
+                    quests = listQuestions[quest]['keyboard']
+                    if quests != None:    
+                        quests = quests.keys()
+                        text = '\n'
+                        for rang,i in enumerate(quests):
+                            text +=f'{rang} -> '+ i + '\n'
+                        quests= text
+                    else:
+                        quests = ''
+                    bot.send_message(userID,listQuestions[quest]['text']+ '\n' + quests)
+
+                # keyboard = create_inlinekeyboard_is_row(listQuestions[quest]['keyboard']) if listQuestions[quest]['keyboard'] != None else None
+                # bot.send_message(userID,listQuestions[quest]['text'],reply_markup=keyboard)
             else:
                 if COUNT_ZABOR_USER[userID]['max'] > 1:
                     # sql.set_payload(userID, 'quest_last')
@@ -376,7 +454,7 @@ def any_message(message):
 
         except Exception as e:
 
-            # logger.debug(f'{e=}')
+            logger.debug(f'{e=}')
             # bot.send_message(userID,'Спасибо за ответ1ы, мы просчитаем Ваш проект и свяжемся с вами')
             # sql.set_payload(userID, 'exit')
             # # bot.send_message(userID, f'{QUESTS_USERS[userID]=}')

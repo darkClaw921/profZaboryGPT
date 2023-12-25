@@ -68,7 +68,11 @@ class Sheet():
             #print(f'{b=}')
 
         return lst
-
+    
+    def find_cell(self, value:str):
+        """Ищет ячейку по значению"""
+        return self.sheet.find(value)
+    
     # def get_gs_text(self):
     #     allText = '\n\n<Описание Проектов>'
     #     urls={}
@@ -164,9 +168,11 @@ def prepare_words(lst:list):
 if __name__ == '__main__':
     pass
     
-    # json = 'GDtxt.json'
-    # sheet = Sheet(json,'darkClaw921_Zaluzi')
-    
+    json = 'GDtxt.json'
+    sheet = Sheet(json,'darkClaw921_Zaluzi', get_worksheet=3)
+    a= sheet.find_cell('Скидка')
+    sheetSale = sheet.get_rom_value(a.row)[-1]
+    print(a)
     #a = sheet.get_rom_value(7) 
     # a = sheet.get_words_and_urls()
     # a = sheet.copy_sheet('testCopy5')

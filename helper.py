@@ -7,18 +7,34 @@ from workGDrive import *
 from workGS import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
-from questions import pokrytie, porydok
+# from questions import pokrytie, porydok,
 import uuid
 import speech_recognition as sr
 language='ru_RU'
 r = sr.Recognizer()
 
+month_translations = {
+    "January": "январь",
+    "February": "февраль",
+    "March": "март",
+    "April": "апрель",
+    "May": "май",
+    "June": "июнь",
+    "July": "июль",
+    "August": "август",
+    "September": "сентябрь",
+    "October": "октябрь",
+    "November": "ноябрь",
+    "December": "декабрь"
+}
 
+# from questions import * 
+from questionsNoKeyboard import *
 # any
-def get_dates(day):
+def get_dates(day, patern = '%Y-%m-%dT%H:%M:%SZ'):
     # Текущая дата
     #patern = '2023-07-18T20:26:32Z'
-    patern = '%Y-%m-%dT%H:%M:%SZ'
+    # patern = '%Y-%m-%dT%H:%M:%SZ'
     current_date = datetime.now().strftime(patern)
 
     # Дата, отстоящая на 30 дней
@@ -290,6 +306,173 @@ def send_values_in_sheet(typeMaterial:str, values:list, sheetName:str, first:boo
     # sheet.export_pdf(sheetName)
     return sheetName
 
+
+def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:str, first:bool=False, mkad=0):
+    if first:
+        copy_file('1c3cz_6RvneBEitvgtTxL5lxVfBdKb4kmyG9f8QqoUp0', sheetName)
+    sheet = Sheet('GDtxt.json',sheetName,get_worksheet=1)
+    # sheet.export_pdf(sheetName) 
+    # 1/0
+    # keyProfNastil = questionProfNastil.keys()
+    # keyGridRabit = questionGridRabit.keys()
+    # key3d = question3d.keys()
+    # keyZaluzi = questionZaluzi.keys()
+    
+    #клавиатуры
+    upValuesProfNastil = list(questionProfNastil['2']['keyboard'].keys())
+    widthValuesProfNastil = list(questionProfNastil['3']['keyboard'].keys())
+    coverageValuesProfNastil = list(questionProfNastil['4']['keyboard'].keys())
+    
+
+    upValuesGridRabit = list(questionGridRabit['2']['keyboard'].keys())
+    armatyraValuesGridRabit = list(questionGridRabit['3']['keyboard'].keys())
+
+
+    upValues3d = list(question3d['2']['keyboard'].keys())
+
+    upValuesZaluzi = list(questionZaluzi['2']['keyboard'].keys())
+
+    upValuesEvroShtak = list(questionEvroShtak['2']['keyboard'].keys())
+    stepEvroShtak = list(questionEvroShtak['3']['keyboard'].keys())
+    coverageValuesEvroShtak = list(questionEvroShtak['4']['keyboard'].keys())
+    zazorValuesEvroShtak = list(questionEvroShtak['5']['keyboard'].keys())
+
+
+
+    
+
+
+    if typeMaterial == 'profNastil1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('B2', str(values[1]).replace('.',','))
+        sheet.send_cell('B3', upValuesProfNastil[int(values[2])].replace('.',','))
+        sheet.send_cell('B6', widthValuesProfNastil[int(values[3])].replace('.',','))
+        sheet.send_cell('B8', coverageValuesProfNastil[int(values[4])])
+        sheet.send_cell('B16', values[5])
+        sheet.send_cell('B23', values[6])
+        try:
+            sheet.send_cell('C170', values[7])
+        except:
+            1+0
+    if typeMaterial == 'profNastil2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('J2', str(values[1]).replace('.',','))
+        sheet.send_cell('J3', upValuesProfNastil[int(values[2])].replace('.',','))
+        sheet.send_cell('J6', widthValuesProfNastil[int(values[3])].replace('.',','))
+        sheet.send_cell('J8', coverageValuesProfNastil[int(values[4])])
+        sheet.send_cell('J16', values[5])
+        sheet.send_cell('J23', values[6])
+        # sheet.send_cell('C170', values[7])
+    if typeMaterial == 'profNastil3':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('R2', str(values[1]).replace('.',','))
+        sheet.send_cell('R3', upValuesProfNastil[int(values[2])].replace('.',','))
+        sheet.send_cell('R6', widthValuesProfNastil[int(values[3])].replace('.',','))
+        sheet.send_cell('R8', coverageValuesProfNastil[int(values[4])])
+        sheet.send_cell('R16', values[5])
+        sheet.send_cell('R23', values[6])
+    
+    if typeMaterial == 'evroShtak1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('Z2', str(values[1]).replace('.',','))
+        sheet.send_cell('Z3', str(values[2]).replace('.',','))
+        sheet.send_cell('Z6', porydok[str(values[3])])
+        sheet.send_cell('Z8', pokrytie[str(values[4])])
+        # sheet.send_cell('Z6', str(values[3]))
+        # sheet.send_cell('Z8', str(values[4]))
+        sheet.send_cell('Z10', values[5])# зазор
+        sheet.send_cell('Z16', values[6])
+        sheet.send_cell('Z23', values[7])
+        try:
+            sheet.send_cell('C170', values[8])
+        except:
+            1+0
+
+    if typeMaterial == 'evroShtak2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('AH2', str(values[1]).replace('.',','))
+        sheet.send_cell('AH3', str(values[2]).replace('.',','))
+        sheet.send_cell('AH6', porydok(str(values[3])))
+        sheet.send_cell('AH8', pokrytie[str(values[4])])
+        sheet.send_cell('AH10', values[5])# зазор
+        sheet.send_cell('AH16', values[6])
+        sheet.send_cell('AH23', values[7])
+
+    if typeMaterial == 'evroShtak3':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('AP2', str(values[1]).replace('.',','))
+        sheet.send_cell('AP3', str(values[2]).replace('.',','))
+        sheet.send_cell('AP6', porydok(str(values[3])))
+        sheet.send_cell('AP8', pokrytie[str(values[4])])
+        sheet.send_cell('AP10', values[5])# зазор
+        sheet.send_cell('AP16', values[6])
+        sheet.send_cell('AP23', values[7])
+    
+    if typeMaterial == 'GridRabit1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('AX2', str(values[1]).replace('.',','))
+        sheet.send_cell('AX3', str(values[2]).replace('.',','))
+        sheet.send_cell('AX4', values[3])
+        sheet.send_cell('AX15', values[4])
+        sheet.send_cell('AX22', values[5])
+    
+    if typeMaterial == 'GridRabit2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('BF2', str(values[1]).replace('.',','))
+        sheet.send_cell('BF3', str(values[2]).replace('.',','))
+        sheet.send_cell('BF4', values[3])
+        sheet.send_cell('BF15', values[4])
+        sheet.send_cell('BF22', values[5])
+    
+    if typeMaterial == '3d1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+
+        sheet.send_cell('BN2', str(values[1]).replace('.',','))
+        sheet.send_cell('BN3', str(values[2]).replace('.',','))
+        sheet.send_cell('BN16', values[3])
+        sheet.send_cell('BN23', values[4])
+    
+    if typeMaterial == '3d2':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('BV2', str(values[1]).replace('.',','))
+        sheet.send_cell('BV3', str(values[2]).replace('.',','))
+        sheet.send_cell('BV16', values[3])
+        sheet.send_cell('BV23', values[4])
+    
+    if typeMaterial == 'Zaluzi1':
+        print('отправка значений ' + typeMaterial)
+        a = sheet.get_cell(1,1)
+        print(a)
+        sheet.send_cell('CT2', str(values[1]).replace('.',','))
+        sheet.send_cell('CT3', str(values[2]).replace('.',','))
+        sheet.send_cell('CT16', values[3])
+        sheet.send_cell('CT23', values[4])
+    sheet.send_cell('C170', mkad)
+
+    # sheet.export_pdf(sheetName)
+    return sheetName
 
 #Google Drive 
 import base64
