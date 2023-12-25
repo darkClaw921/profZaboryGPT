@@ -17,10 +17,13 @@ import requests
 from pprint import pprint
 from dotenv import load_dotenv
 load_dotenv()
+import os
 GEOPOINT_BASE = '56.121457,37.895073'
 # GEOPOINT_BASE = '37.895073,56.121457'
-
-
+GEOCODER_API = os.environ.get('GEOCODER_API')
+MATRIX_API = os.environ.get('MATRIX_API')
+GEOADRES = os.environ.get('GEOADRES_API')
+STATIC_API = os.environ.get('STATIC_API')
 
 def get_geopoint(adress:str="липецк каменный лог 48"):
 
