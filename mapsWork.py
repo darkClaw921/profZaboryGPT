@@ -15,13 +15,12 @@
 # print(f"Расстояние маршрута: {distance} метров")
 import requests
 from pprint import pprint
+from dotenv import load_dotenv
+load_dotenv()
 GEOPOINT_BASE = '56.121457,37.895073'
 # GEOPOINT_BASE = '37.895073,56.121457'
 
-GEOCODER_API = '5b664018-4356-4032-ab41-8f3dd8ed5940'
-MATRIX_API = 'b53d4625-189e-4f3f-88df-8f43553d161a'
-STATIC_API = 'bdd5228a-b658-4665-a381-d9cbc4e27a2d'
-GEOADREDS_API = '08bc34bd-ed3f-4441-b670-071bdcae068d'
+
 
 def get_geopoint(adress:str="липецк каменный лог 48"):
 
