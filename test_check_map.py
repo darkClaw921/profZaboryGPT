@@ -12,7 +12,7 @@ def create_check_map(points:list):
     # for point in points:
 # /        folium.Marker(location=[point[1], point[0]]).add_to(m)
         # folium.Marker(location=[point[0], point[1]]).add_to(m)
-    a = [(point[1], point[0]) for point in points]
+    a = [(point[0], point[1]) for point in points]
     folium.PolyLine(a, tooltip="Coast").add_to(m)
     # сохраняем карту в HTML файл
     m.save('map.html')

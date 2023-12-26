@@ -59,9 +59,10 @@ def get_geopoint(adress:str="липецк каменный лог 48"):
 def get_distance(pointStar:str,pointEnd:str):
     # pointStar = "25.234369457896325,55.280222457968712"
     # pointEnd = "25.234369457896325,55.401544758961258"
-
+    pointEnd = pointEnd.split(',') 
+    pointEnd_revers = f"{pointEnd[1]},{pointEnd[0]}"# '39.599229,52.608826'
     # reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd}&avoid_tolls=true&mode=truck&apikey={MATRIX_API}"
-    reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd}&avoid_tolls=true&mode=truck&apikey={MATRIX_API}"
+    reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd_revers}&avoid_tolls=true&mode=truck&apikey={MATRIX_API}"
     # reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd}&avoid_tolls=true&mode=truck&weight=12&apikey={MATRIX_API}"
     print(reqUrl)
     response = requests.get(reqUrl)
@@ -89,13 +90,16 @@ def get_distance(pointStar:str,pointEnd:str):
         #     # points += f"{point[0]},{point[1]},"
         #     break
         point = step['polyline']['points'][0]
-        points += f"{point[0]},{point[1]},"
+        points += f"{point[1]},{point[0]},"
+        # points += f"{point[0]},{point[1]},"
 
         point = step['polyline']['points'][lenStep]
-        points += f"{point[0]},{point[1]},"
+        points += f"{point[1]},{point[0]},"
+        # points += f"{point[0]},{point[1]},"
 
         point = step['polyline']['points'][-1]
-        points += f"{point[0]},{point[1]},"
+        points += f"{point[1]},{point[0]},"
+        # points += f"{point[0]},{point[1]},"
         
         allPoint.extend(step['polyline']['points'])
 
@@ -116,10 +120,10 @@ def get_static_map(points:str,pointEnd:str):
     
     # pointEnd = pointEnd.split(',') 
     # pointEnd_revers = f"{pointEnd[1]},{pointEnd[0]}"# '39.599229,52.608826'
-    pointEnd_revers = pointEnd
+    # pointEnd_revers = pointEnd
     # reqUrl = f"https://static-maps.yandex.ru/v1?lang=ru_RU&ll={GEOPOINT_BASE_revers}&pt={GEOPOINT_BASE_revers},pm2am~37.319484,55.820369,pm2bm&pl=c:8822DDC0,w:5,{points}&apikey=bdd5228a-b658-4665-a381-d9cbc4e27a2d"
     #TODO использовать uri для посторения точного маршрута
-    reqUrl = f"https://static-maps.yandex.ru/v1?lang=ru_RU&pt={GEOPOINT_BASE_revers},pm2am~{pointEnd_revers},pm2bm&pl=c:8822DDC0,w:5,{points}&apikey=bdd5228a-b658-4665-a381-d9cbc4e27a2d" 
+    reqUrl = f"https://static-maps.yandex.ru/v1?lang=ru_RU&pt={GEOPOINT_BASE_revers},pm2am~{pointEnd},pm2bm&pl=c:8822DDC0,w:5,{points}&apikey=bdd5228a-b658-4665-a381-d9cbc4e27a2d" 
     
     # reqUrl = f"https://static-maps.yandex.ru/v1?lang=ru_RU&pt={points}&apikey=bdd5228a-b658-4665-a381-d9cbc4e27a2d"
     print(reqUrl)
@@ -160,7 +164,7 @@ def main():
 def get_map(adress:str)->list:
     """Путь до картинки и расстояние"""
     pointEnd = get_geopoint(adress=adress)
-    pointStart = GEOPOINT_BASE_revers
+    pointStart = GEOPOINT_BASE
     # pointEnd = '37.319432,55.820375'
     # pointStart = '37.893685,56.120397'
     # pointEnd = '52.608826,39.599229'
