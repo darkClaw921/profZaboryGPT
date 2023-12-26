@@ -16,7 +16,7 @@ from workGDrive import *
 from telebot.types import InputMediaPhoto
 from workRedis import *
 import workGS
-
+from mapsWork import *
 import requests
 from amocrmWork import create_lead, create_contact, update_lead
 
@@ -47,6 +47,7 @@ TYPE_QUESTIONS = {'profNastil': questionProfNastil,
 URL_USERS = {}
 QUESTS_USERS = {}
 COUNT_ZABOR_USER={}
+CACH_USER = {}
 MODEL_URL= 'https://docs.google.com/document/d/1M_i_C7m3TTuKsywi-IOMUN0YD0VRpfotEYNp1l2CROI/edit?usp=sharing'
 #gsText, urls_photo = sheet.get_gs_text()
 #print(f'{urls_photo=}')
@@ -264,7 +265,7 @@ def callback_inline(callFull):
 @bot.message_handler(content_types=['text'])
 @logger.catch
 def any_message(message):
-    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER, isSend
+    global URL_USERS, QUESTS_USERS,TYPE_QUESTIONS,COUNT_ZABOR_USER, isSend, CACH_USER
     #print('это сообщение', message)
     #text = message.text.lower()
     text = message.text
@@ -347,12 +348,53 @@ def any_message(message):
         bot.send_message(userID,textAnswer,reply_markup=keyboard_quest1())
         return 0
     
+    if payload == 'quest_last1':
+        try:
+            text= int(text)
+        except:
+            1+0
+            
+        if text.isdigit():
+            payload = 'quest_end'
+        else:
+            adres = get_more_adress(text)
+            quests = adres
+            if quests != None:   
+                quests = quests.values()
+                text = '\n'
+                for rang,i in enumerate(quests):
+                    text +=f'{rang} -> '+ i + '\n'
+                quests= text
+            else:
+                quests = ''
+            textAnswer = f'Выберите адрес из списка и напишите его номер\n{quests}'
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
+            bot.send_message(userID,textAnswer)
+            sql.set_payload(userID, 'quest_last2')
+            CACH_USER[userID] = {'adress':adres}
+            return 0
+    
+    if payload == 'quest_last2':
+        if text.isdigit():
+            text = CACH_USER[userID]['adress'][text]
+            mapPath, distance = get_map(text)
+            payload = 'quest_end'
+            
+        else:
+            textAnswer = 'Вы ввели некорректный адрес, попробуйте еще раз'
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
+            bot.send_message(userID,textAnswer)
+            return 0
+
+
     if payload == 'quest_last':
-        textAnswer = 'Растояние от МКАД (км)'
+        textAnswer = 'Растояние от МКАД (км) или введите ваш адрес'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
-        sql.set_payload(userID, 'quest_end')
+        # sql.set_payload(userID, 'quest_end')
+        sql.set_payload(userID, 'quest_last1')
         bot.send_message(userID,textAnswer)
         return 0
+    
     
     if payload == 'quest_end':
         textAnswer='Делаем расчет стоимости забора...'
@@ -368,7 +410,7 @@ def any_message(message):
             typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
             print(f'{typeQuest1=}')
             # path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
-            path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
+            path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)   
             COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
@@ -379,6 +421,8 @@ def any_message(message):
         a= sheet.find_cell('Скидка')
         sheetSale = sheet.get_rom_value(a.row)[-1]
         nowDate, futureDate = get_dates(7, '%d-%m')
+        
+        
         
         with open('pdfCalc/'+path+'.pdf', 'rb') as pdf_file:
             # textAnswer='Вот предворительный расчет, после проверки менеджер свяжется с вами и предоставит скидку'
@@ -407,7 +451,8 @@ def any_message(message):
             bot.send_document(userID, pdf_file)#filename='file.pdf')
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: отправил файл {path}', timeout=1)
             add_message_to_history(userID,'assistant','КЛИЕНТ УЖЕ СДЕЛАЛ РАСЧЕТ В КАЛЬКУЛЯТОРЕ, больше не предлагать')
-            COUNT_ZABOR_USER[userID] = {'max':int(text),
+            # COUNT_ZABOR_USER[userID] = {'max':int(text),
+            COUNT_ZABOR_USER[userID] = {'max':1,
                                         'real': 1,
                                         'profNastil': 1,
                                         'evroShtak':1,
@@ -415,6 +460,7 @@ def any_message(message):
                                         '3d':1,
                                         'Zaluzi':1}
             QUESTS_USERS[userID] = {}
+            bot.send_photo(userID, mapPath)
         return 0
 
     if payload.startswith('quest'):

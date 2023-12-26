@@ -136,6 +136,17 @@ def prepare_dict_keyboadr(dic)->str:
         st += f'{key}. {value}\n'
     return st
 
+def list_to_str(lst:dict)->str:
+    if quests != None:   
+        quests = quests.keys() 
+        text = '\n'
+        for rang,i in enumerate(quests):
+            text +=f'{rang} -> '+ i + '\n'
+        quests= text
+    else:
+        quests = ''
+    return quests
+
 
 def find_phone_numbers(text):
     pattern = r'(\+?\d{1,2}\s?[-(]?\d{3}[-)]?\s?\d{3}\s?[-]?\s?\d{2}\s?[-]?\s?\d{2})'
@@ -317,7 +328,8 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
     # keyGridRabit = questionGridRabit.keys()
     # key3d = question3d.keys()
     # keyZaluzi = questionZaluzi.keys()
-    
+    if len(values) == 1:
+        return sheetName
     #клавиатуры
     upValuesProfNastil = list(questionProfNastil['2']['keyboard'].keys())
     widthValuesProfNastil = list(questionProfNastil['3']['keyboard'].keys())
