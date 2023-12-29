@@ -718,15 +718,15 @@ if __name__ == '__main__':
     #PROMT_PODBOR_HOUSE = 'https://docs.google.com/document/d/1WTS8SQ2hQSVf8q3trXoQwHuZy5Q-U0fxAof5LYmjYYc/edit?usp=sharing'
     
     #TODO
-    # sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
-    # # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
-    # logger.debug('sheet загружена')
-    # a = sheet.get_rom_value(1)
-    # logger.debug('a загружена')
+    sheet = workGS.Sheet('profzaboru-5f6f677a3cd8.json','Ссылки на изображения')
+    # sheet = workGS.Sheet('kgtaprojects-8706cc47a185.json','Ссылки на изображения')
+    logger.debug('sheet загружена')
+    a = sheet.get_rom_value(1)
+    logger.debug('a загружена')
     #TODO
-    # CHECK_WORDS = sheet.get_words_and_urls()
-    # logger.debug('CHECK_WORDS загружена')
-    # # # check_time_last_message(400923372)
+    CHECK_WORDS = sheet.get_words_and_urls()
+    logger.debug('CHECK_WORDS загружена')
+    # # check_time_last_message(400923372)
 
     print(f'[OK]')
     bot.infinity_polling()
