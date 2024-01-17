@@ -17,7 +17,7 @@ app.config["SECRET_KEY"] = "supersecretkey"
 socketio = SocketIO(app)
 
 # A mock database to persist data
-
+rooms = {}
 
 # def send_message_to_telegram():
     

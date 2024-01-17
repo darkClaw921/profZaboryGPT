@@ -179,7 +179,7 @@ def get_map(adress:str)->list:
 # distanse, points = get_distance(GEOPOINT_BASE,pointEnd)
 # mapPath = get_static_map(points,pointEnd)
 # a = get_more_adress('каменный лог 48')
-get_map('Московская область, красногорск')
+# get_map('Московская область, красногорск')
 # get_map('Владимирская область, город Владимир')
 # print(quests)
 # get_geopoint()

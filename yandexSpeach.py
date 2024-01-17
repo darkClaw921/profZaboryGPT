@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 load_dotenv
 @logger.catch
 def get_text_record(fileName:str):
-    FOLDER_ID = "b1g83bovl5hjt7cl583v" # Идентификатор каталога
-    API_KEY = os.environ.get('API_KEY_YANDEX_SPEACH')
+    # FOLDER_ID = "b1g83bovl5hjt7cl583v" # Идентификатор каталога
+    FOLDER_ID = "b1gsjnbm513bqeuv6569" # Идентификатор каталога
+    API_KEY = os.environ.get('API_KEY_YANDEX_SPEACH_dorin')
     # filePath = '/Users/igorgerasimov/Python/Bitrix/test-chatGPT/aa/record.ogg'
 
     # длинные аудио
@@ -18,7 +19,7 @@ def get_text_record(fileName:str):
     # Укажите ваш API-ключ и ссылку на аудиофайл в Object Storage.
     #key = '<IAM-токен_сервисного_аккаунта>'
     #filelink = 'https://storage.yandexcloud.net/ai-akademi-zabory-audios/audio_2023-08-03_20-05-07.ogg'
-    filelink = f'https://storage.yandexcloud.net/ai-akademi-zabory-audios/{fileName}'
+    filelink = f'https://storage.yandexcloud.net/speech-kit-ai-akademi/{fileName}'
 
     POST = "https://transcribe.api.cloud.yandex.net/speech/stt/v2/longRunningRecognize"
 
@@ -26,8 +27,9 @@ def get_text_record(fileName:str):
         "config": {
             "specification": {
                 'audioEncoding': 'MP3',
-                # "languageCode": "ru-RU"
-                "languageCode": "en-EN"
+                # 'audioEncoding': 'OGG',
+                "languageCode": "ru-RU"
+                # "languageCode": "en-EN"
             }
         },
         "audio": {
@@ -64,6 +66,7 @@ def get_text_record(fileName:str):
     # print("Text chunks:")
     # pprint(req)
     fullText=''
+    pprint(req)
     for chunk in req['response']['chunks']:
         # print(chunk['alternatives'][0]['text'])
         # fullText =+ chunk['alternatives'][0]['text']
@@ -85,8 +88,10 @@ session = boto3.session.Session()
 s3 = session.client(
     service_name='s3',
     endpoint_url='https://storage.yandexcloud.net',
-    aws_access_key_id=os.environ.get('aws_access_key_id'),
-    aws_secret_access_key=os.environ.get('aws_secret_access_key'),
+    # aws_access_key_id=os.environ.get('aws_access_key_id'),
+    # aws_secret_access_key=os.environ.get('aws_secret_access_key'),
+    aws_access_key_id=os.environ.get('aws_access_key_id_dorin'),
+    aws_secret_access_key=os.environ.get('aws_secret_access_key_dorin'),
 )
 # Создать новый бакет
 # s3.create_bucket(Bucket='bucket-name-123')
@@ -104,10 +109,10 @@ s3 = session.client(
 def upload_file(key, body:str):
     # s3.put_object(Bucket='ai-akademi-zabory-audios', Key=key,
     #           Body=body, StorageClass='COLD')
-    s3.upload_file(key, 'ai-akademi-zabory-audios', key)
+    s3.upload_file(key, 'speech-kit-ai-akademi', key)
 
 def get_file(key)->int:
-    get_object_response = s3.get_object(Bucket='ai-akademi-zabory-audios', Key=key)['Body'].read()
+    get_object_response = s3.get_object(Bucket='speech-kit-ai-akademi', Key=key)['Body'].read()
     return(int(get_object_response))
 
 
