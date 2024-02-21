@@ -80,12 +80,14 @@ def get_url_record(fileID:str):
     # upload_file(fileName, bytes) #YSC 
     print("Файл успешно загружен") 
     text=transcript_audio(fileName) # GPT
+    print('Получли текст')
     # text = get_text_record(fileName) #YSC
     print(text)
-    with open('textPrepare', "w") as file:
+    with open('textPrepare.txt', "w") as file:
         file.write(text)
     # with open(f'{fileID}.txt', "w") as file:
     #     file.write(text) 
+    
     os.remove(fileName)
     return text
 
@@ -121,11 +123,18 @@ def prepare_answer_gpt(answerGPT):
     bad = slice_str(answerGPT,'Плохо:','Рекомендации:')
     recomend = slice_str(answerGPT,'Рекомендации:','.')
     return ball, rez, good, bad, recomend
-
+badPhones = [
+'+79652050875',
+'+79652050861',
+'+79652050854',
+'+79660326963',
+'+79660326967',
+'+79660320058',
+]
 # @logger.catch
 def main():
     # calls = client.get_call_stats(from_date=datetime.now(), to_date=datetime.now(), first_time=1)   # return csv data
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=2)), to_date=(datetime.now() - timedelta(days=2)), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=(datetime.now() - timedelta(days=0)), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
     # logger.debug(f'{len(calls)}')
     # return 0 
@@ -142,9 +151,13 @@ def main():
             print(f"{call['Длительность звонка']=} {call['ID записи']=} {call['Откуда']=} {call['Схема']=} {call['Куда']=}")
             pprint(call)
             phone = call['Откуда']
+            phoneBad=call['Куда']
             if call['\ufeffТип'] == 'Исходящий':
                 phone = call['Куда']
-            
+                phoneBad=call['Откуда']
+
+            if phoneBad in badPhones or phone in badPhones:
+                continue
             date = call['Время']
             assignedCRM = call['Ответственный из CRM']
             
@@ -166,6 +179,7 @@ def main():
                 #TODO переделать на async
                 text = get_url_record(call['ID записи']) 
             except Exception as e:
+                print(e)
                 logger.error(e)
                 continue
             if text is None : continue
@@ -173,8 +187,10 @@ def main():
             #иногда нужно повторить
             logger.debug('отправляем в gpt')
             try:
-                
-                answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
+                promt1='напиши по строчкам кто горорил Клиент: или Оператор: учитывай что первый говорил Оператор:'
+                answerGPTPrepare = gpt.answer(promt1,[{"role": "user", "content": text}])[0]
+                print(f'{answerGPTPrepare=}')
+                answerGPT = gpt.answer(promt,[{"role": "user", "content": answerGPTPrepare}])[0]
             except Exception as e:
                 logger.error(e)
                 continue
@@ -183,7 +199,7 @@ def main():
             logger.debug('получили ответ от gpt')
             ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
             print(answerGPT)
-            lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone, text]
+            lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone, answerGPTPrepare, call['\ufeffТип']]
             
             sheet.insert_cell(data=lst)
 

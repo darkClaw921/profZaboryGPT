@@ -57,6 +57,7 @@ def create_lead(userName, userID):
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
     lead.urlChatRoom = f'http://64.226.97.140:5005/room/{userID}'
     lead.trafickPath = 'Telegram'
+    lead.pipeline=7810518
     leadID = lead.save()
     return leadID
     # Lead.create(name=userName)
@@ -74,7 +75,10 @@ def create_contact(userName, phone:str):
 
 def get_leadID_from_contact(phone:str):
     conta = Contact.objects.get(query=phone)
-    leadID = conta.leads._data[0]['id']
+    try:
+        leadID = conta.leads._data[0]['id']
+    except:
+        leadID=0
     # leadID = conta.leads._data
     return leadID
     # lead = Lead.objects.get(f'{leadID}')
