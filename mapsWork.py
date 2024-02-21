@@ -146,7 +146,7 @@ def get_more_adress(adress:str):
             adresDict[str(i)] = f"{adres['subtitle']['text']} {adres['title']['text']}"
         except:
             adresDict[str(i)] = f"{adres['title']['text']}"
-        if i==3: break
+        if i==2: break
     pprint(adresDict)
     return adresDict
 
