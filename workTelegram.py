@@ -377,7 +377,11 @@ def any_message(message):
     if payload == 'quest_last2':
         if text.isdigit():
             text = CACH_USER[userID]['adress'][text]
-            mapPath, distance = get_map(text)
+            try:
+                mapPath, distance = get_map(text)
+            except Exception as e:
+                logger.debug(f'{e=}')
+                bot.send_message(userID, 'Попробуйте отправить еще раз')
             payload = 'quest_end'
             
         else:
