@@ -395,12 +395,12 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         a = sheet.get_cell(1,1)
         print(a)
         sheet.send_cell('Z2', str(values[1]).replace('.',','))
-        sheet.send_cell('Z3', str(values[2]).replace('.',','))
-        sheet.send_cell('Z6', porydok[str(values[3])])
-        sheet.send_cell('Z8', pokrytie[str(values[4])])
+        sheet.send_cell('Z3', upValuesEvroShtak[str(values[2])].replace('.',','))
+        sheet.send_cell('Z6', stepEvroShtak[str(values[3])])
+        sheet.send_cell('Z8', coverageValuesEvroShtak[str(values[4])])
         # sheet.send_cell('Z6', str(values[3]))
         # sheet.send_cell('Z8', str(values[4]))
-        sheet.send_cell('Z10', values[5])# зазор
+        sheet.send_cell('Z10', zazorValuesEvroShtak[str(values[5])])# зазор
         sheet.send_cell('Z16', values[6])
         sheet.send_cell('Z23', values[7])
         try:
@@ -438,8 +438,8 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         print(a)
 
         sheet.send_cell('AX2', str(values[1]).replace('.',','))
-        sheet.send_cell('AX3', str(values[2]).replace('.',','))
-        sheet.send_cell('AX4', values[3])
+        sheet.send_cell('AX3', upValuesGridRabit[str(values[2])].replace('.',','))
+        sheet.send_cell('AX4', armatyraValuesGridRabit[str(values[3])])
         sheet.send_cell('AX15', values[4])
         sheet.send_cell('AX22', values[5])
     
@@ -449,8 +449,8 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         print(a)
 
         sheet.send_cell('BF2', str(values[1]).replace('.',','))
-        sheet.send_cell('BF3', str(values[2]).replace('.',','))
-        sheet.send_cell('BF4', values[3])
+        sheet.send_cell('BF3', upValuesGridRabit[str(values[2])].replace('.',','))
+        sheet.send_cell('BF4', armatyraValuesGridRabit[str(values[3])])
         sheet.send_cell('BF15', values[4])
         sheet.send_cell('BF22', values[5])
     
@@ -460,7 +460,7 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         print(a)
 
         sheet.send_cell('BN2', str(values[1]).replace('.',','))
-        sheet.send_cell('BN3', str(values[2]).replace('.',','))
+        sheet.send_cell('BN3',  upValues3d[str(values[2])].replace('.',','))
         sheet.send_cell('BN16', values[3])
         sheet.send_cell('BN23', values[4])
     
@@ -469,7 +469,7 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         a = sheet.get_cell(1,1)
         print(a)
         sheet.send_cell('BV2', str(values[1]).replace('.',','))
-        sheet.send_cell('BV3', str(values[2]).replace('.',','))
+        sheet.send_cell('BV3', upValues3d[str(values[2])].replace('.',','))
         sheet.send_cell('BV16', values[3])
         sheet.send_cell('BV23', values[4])
     
@@ -478,7 +478,7 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         a = sheet.get_cell(1,1)
         print(a)
         sheet.send_cell('CT2', str(values[1]).replace('.',','))
-        sheet.send_cell('CT3', str(values[2]).replace('.',','))
+        sheet.send_cell('CT3', upValuesZaluzi[str(values[2])].replace('.',','))
         sheet.send_cell('CT16', values[3])
         sheet.send_cell('CT23', values[4])
     sheet.send_cell('C170', mkad)

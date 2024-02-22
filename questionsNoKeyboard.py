@@ -2,14 +2,14 @@
 import workYDB 
 from createKeyboard import *
 
-pokrytie = {'odnostoronee':'Одностороннее', 
-        'dvystoronee':'Двухстороннее',
-        'otsincovonoe':'Оцинкованное',
-        'woodOdnostoronee':'Имитация дерева/односторонняя',
-        'woodDvystoronee':'Имитация дерева/двухсторонняя',
+pokrytie = {'0':'Одностороннее', 
+        '1':'Двухстороннее',
+        '2':'Оцинкованное',
+        '3':'Имитация дерева/односторонняя',
+        '4':'Имитация дерева/двухсторонняя',
     }
-porydok = {'normal':'Обычный', 
-        'chees':'Шахматный',
+porydok = {'0':'Обычный', 
+        '1':'Шахматный',
     }
 LAST_QUESTION = 'Это конец вопросов секции'
 questionProfNastil = {
