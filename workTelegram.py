@@ -414,7 +414,16 @@ def any_message(message):
             typeQuest1 = f"{answers[0]}{COUNT_ZABOR_USER[userID][answers[0]]}"
             print(f'{typeQuest1=}')
             # path = send_values_in_sheet(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=text)   
-            path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)   
+            try:
+                path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)  
+            except Exception as e:
+                textError = 'Не удалось отправить вам pdf с расчетом стоимости, попробуйте чуть позднее'
+                bot.send_message(userID, textError)
+                a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textError}',timeout=1)
+                logger.debug(f'{e=}')
+                time.sleep(2)
+                path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)
+
             COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
