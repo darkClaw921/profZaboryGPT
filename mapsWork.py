@@ -25,7 +25,7 @@ GEOPOINT_BASE = '56.121457,37.895073'
 # GEOPOINT_BASE = '37.895073,56.121457'
 GEOCODER_API = os.environ.get('GEOCODER_API')
 MATRIX_API = os.environ.get('MATRIX_API')
-GEOADRES = os.environ.get('GEOADRES_API')
+GEOADREDS_API = os.environ.get('GEOADREDS_API')
 STATIC_API = os.environ.get('STATIC_API')
 
 AVOID_ZONE='55.729772,37.620528|55.752637,37.583323|55.773591,37.621260|55.750507,37.656021'
@@ -62,9 +62,7 @@ def get_distance(pointStar:str,pointEnd:str):
 
     print(pointEnd_revers)
     print(pointEnd)
-    # reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd}&avoid_tolls=true&mode=truck&apikey={MATRIX_API}" 
     reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd_revers}&avoid_zones={AVOID_ZONE}&avoid_tolls=true&mode=truck&apikey={MATRIX_API}"
-    # reqUrl = f"https://api.routing.yandex.net/v2/route?waypoints={pointStar}|{pointEnd}&avoid_tolls=true&mode=truck&weight=12&apikey={MATRIX_API}"
     print(reqUrl)
     response = requests.get(reqUrl)
     data = response.json()
@@ -135,6 +133,7 @@ def get_static_map(points:str,pointEnd:str):
 def get_more_adress(adress:str):
     url = f"https://suggest-maps.yandex.ru/v1/suggest?apikey={GEOADREDS_API}&text={adress}&lang=ru_RU"
     response = requests.get(url)
+    print(response.text)
     data = response.json()
     pprint(data)
     adress = data['results']
@@ -167,6 +166,7 @@ def get_map(adress:str)->list:
     return mapPath, distanse
 
 
+get_more_adress('липецк')
 # distanse, points = get_distance(GEOPOINT_BASE,pointEnd)
 # mapPath = get_static_map(points,pointEnd)
 # get_map('Московская область, красногорск')
