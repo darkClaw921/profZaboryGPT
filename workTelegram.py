@@ -388,11 +388,12 @@ def any_message(message):
             textAnswer = 'Вы ввели некорректный адрес, попробуйте еще раз'
             a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
             bot.send_message(userID,textAnswer)
-            return 0
+            payload='quest_last'
+            # return 0
 
 
     if payload == 'quest_last':
-        textAnswer = 'Растояние от МКАД (км) или введите ваш адрес'
+        textAnswer = 'Введите ваш адрес'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         # sql.set_payload(userID, 'quest_end')
         sql.set_payload(userID, 'quest_last1')
