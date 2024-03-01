@@ -393,7 +393,7 @@ def any_message(message):
 
 
     if payload == 'quest_last':
-        textAnswer = 'Введите ваш адрес'
+        textAnswer = 'Введи название населенного пункта, где будет произведена установка забора'
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         # sql.set_payload(userID, 'quest_end')
         sql.set_payload(userID, 'quest_last1')
@@ -431,9 +431,10 @@ def any_message(message):
         sheet = Sheet('GDtxt.json',path,get_worksheet=1)
         sheet.export_pdf(path)
         
-        sheet = Sheet('GDtxt.json',path,get_worksheet=3) 
-        a= sheet.find_cell('Скидка')
-        sheetSale = sheet.get_rom_value(a.row)[-1]
+        sheet = Sheet('GDtxt.json',path,get_worksheet=1) 
+        # a= sheet.find_cell('Скидка')
+        sheetSale= sheet.get_cell(173,3)
+        # sheetSale = sheet.get_rom_value(a.row)[-1]
         nowDate, futureDate = get_dates(7, '%d-%m')
         
         
