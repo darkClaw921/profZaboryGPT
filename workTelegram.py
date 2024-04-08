@@ -122,9 +122,9 @@ def say_welcome(message):
         ''
     }
     
-    # lead_id = create_lead(userName=username, userID=userID)
+    lead_id = create_lead(userName=username, userID=userID)
     
-    lead_id =0
+    # lead_id =0
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}

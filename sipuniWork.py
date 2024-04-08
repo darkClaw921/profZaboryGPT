@@ -8,6 +8,7 @@ from chat import GPT
 from amocrmWork import get_leadID_from_contact
 from testLogg import logg
 from translation import transcript_audio
+from postgreWork import add_table
 load_dotenv()
 # /Users/igorgerasimov/Python/Bitrix/profZaboryGPT
 logger=logg('profZaboryGPT','sipuniWork')
@@ -134,7 +135,7 @@ badPhones = [
 # @logger.catch
 def main():
     # calls = client.get_call_stats(from_date=datetime.now(), to_date=datetime.now(), first_time=1)   # return csv data
-    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=(datetime.now() - timedelta(days=0)), first_time=1)   # return csv data
+    calls = client.get_call_stats(from_date=(datetime.now() - timedelta(days=1)), to_date=(datetime.now() - timedelta(days=1)), first_time=1)   # return csv data
     calls  = prepare_calls_stats(calls) 
     # logger.debug(f'{len(calls)}')
     # return 0 
@@ -200,8 +201,24 @@ def main():
             ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
             print(answerGPT)
             lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone, answerGPTPrepare, call['\ufeffТип']]
-            
-            sheet.insert_cell(data=lst)
+
+            tab={
+                'date_call':date,
+                'assigned':assignedCRM,
+                'url_deal':urlDeal,
+                'duration':duration,
+                'ball':ball,
+                'rez':rez,
+                'good':good,
+                'bad':bad,
+                'recomend':recomend,
+                'answer_gpt':answerGPT,
+                'phone':phone,
+                'answer_gpt_prepare':answerGPTPrepare,
+                'type':call['\ufeffТип']
+            } 
+            add_table(tab)
+            # sheet.insert_cell(data=lst)
 
 
 
@@ -214,42 +231,6 @@ def main():
     pass
 if __name__ == '__main__':
     # a = sheet.get_cell(6,3)
-#     text="""Алло
-# Да удобно
-# Точнее у вас параметры меня зовут николай как могу к вам обращаться
-# Меня зовут марина но мы пока делаем предварительный расчет то есть
-# Хорошо считаем 100 погонных метров включая одни ворота 1 калитку
-# Я не могу сказать параметры
-# Да да да
-# Высота забора нестандартная за 20
-# А стандартная какая 2
-# Да
-# Нет стандартную значит двухметровую
-# 2 м считаем и профнастил двухстороннее напыление
-# Да да
-# Установку планируете в ближайшее время
-# Ну не весной нет через какое то время
-# Понял рассчитаюсь с ценами на данный момент они актуальны примерно до 11 февраля если по бюджету понравится можно будет оформить договор с сохранением цены повышение цен на металл у вас не коснется
-# Ага
-# Угу спасибо
-# Так по бюджету установка займет 2 дня бригада приезжает и уезжает с материалом на день при этой высоте используем 2 лаги
-# Самореза кровельный цвет листа
-# Прорезиненной шайбой профнастил новолипецкий металлокомбинат 0 4 толщиной в договоре толщины прописываем и если потребуется мы проверим при вас по участию
-# Столбы используем квадратные 60 на 60 толщина 2 мм заглубляем метр 20
-# Бурения до забивания и утрамбов и гравий под ворота калитку столбы усиленные 80 на 80 и заглубляем на полтора метра
-# Фурнитура входит в одноместные рамки весь каркас будет загрунтован гарантия 2 года по договору и выезд замерщика бесплатный при оформлении
-# Все вместе с доставкой материалы работа получится на 260000 р ровно
-# Угу
-# Хорошо а скажите пожалуйста то есть вы работаете это ваша фирма правильно юридическое лицо то есть договор все как положено оформляем
-# Да мы работаем по договору по белому на рынке 11 год но мы работаем от ип
-# Угу а в чеховском районе вы работаете
-# Конечно у нас производство в подольске
-# А придется попадать все поняла а вот ваш номер вот этот я могу сохранить чтобы потом вам позвонить когда мы сориентируемся по времени и так далее
-# Да конечно вам еще на ватсап придет визитка там будут указаны контакты
-# Ага отлично
-# Да обращайтесь буду рад помочь
-# Спасибо большое
-# Да всего доброго до свидания"""
     # get_url_record_local('1701158977.29346')
     # 1/0
     text='ты кто?'
