@@ -22,7 +22,6 @@ engine = create_engine(f'postgresql://{userName}:{password}@{url}:5432/{db}')
 
 
 
-
  
 # Определяем базу данных
 Base = declarative_base()

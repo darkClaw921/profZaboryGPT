@@ -55,7 +55,7 @@ def create_lead(userName, userID):
     lead = Lead()
     lead.name = f'Клиент {userName} из Telegram'
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
-    lead.urlChatRoom = f'http://64.226.97.140:5005/room/{userID}'
+    lead.urlChatRoom = f'http://159.223.37.145:5004/room/{userID}'
     lead.trafickPath = 'Telegram'
     lead.pipeline=7810518
     leadID = lead.save()
