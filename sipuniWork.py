@@ -193,6 +193,8 @@ def main():
                 print(f'{answerGPTPrepare=}')
                 answerGPT = gpt.answer(promt,[{"role": "user", "content": answerGPTPrepare}])[0]
             except Exception as e:
+                print('ошибка gpt')
+                print(e.__traceback__)
                 logger.error(e)
                 continue
                 # answerGPT = gpt.answer(promt,[{"role": "user", "content": text}])[0]
