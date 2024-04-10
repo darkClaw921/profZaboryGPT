@@ -11,7 +11,7 @@ from translation import transcript_audio
 from postgreWork import add_table
 load_dotenv()
 # /Users/igorgerasimov/Python/Bitrix/profZaboryGPT
-logger=logg('profZaboryGPT','sipuniWork')
+# logger=logg('profZaboryGPT','sipuniWork')
 
 client_id = os.environ.get('SIPUNU_CLIENT_ID')
 secret_id = os.environ.get('SIPUNU_SECRET_ID')
@@ -160,6 +160,7 @@ def main():
             if phoneBad in badPhones or phone in badPhones:
                 continue
             date = call['Время']
+            date = datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
             assignedCRM = call['Ответственный из CRM']
             
             
@@ -170,6 +171,7 @@ def main():
             try:
                 urlDeal = get_leadID_from_contact(phone)    
             except StopIteration:
+                print('urlDeal не найден')
                 continue
 
             urlDeal = f'https://profzabor.amocrm.ru/leads/detail/{urlDeal}'
@@ -180,7 +182,7 @@ def main():
                 #TODO переделать на async
                 text = get_url_record(call['ID записи']) 
             except Exception as e:
-                print(e)
+                print('id записи не неайден', e)
                 logger.error(e)
                 continue
             if text is None : continue

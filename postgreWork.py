@@ -32,10 +32,10 @@ class Table(Base):
     
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     date_call = Column(DateTime)
-    assigned = Column(Integer)
+    assigned = Column(String)
     url_deal = Column(String)
-    duration = Column(Integer)
-    ball = Column(Float)
+    duration = Column(String)
+    ball = Column(String)
     rez = Column(String)
     good = Column(String)
     bad = Column(String)
