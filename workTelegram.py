@@ -317,6 +317,7 @@ def any_message(message):
         # sql.set_payload(userID, 'quest_0')
         bot.send_message(userID,textAnswer,)
         add_message_to_history(userID, 'assistant', textAnswer)
+        sql.set_payload(userID, 'text') 
         return 0 
 
     if payload == 'quest_0':
