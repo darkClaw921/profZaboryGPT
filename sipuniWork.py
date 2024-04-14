@@ -66,13 +66,13 @@ def get_url_record(fileID:str):
     downloadURL = client.get_record(fileID)   
     # bytes = client.get_record(fileID)  
     # print(downloadURL)
-    print('начинаем загрузку файла')
-    try:
-        response = requests.get(downloadURL.encode())
-    except:
-        print('ошибка загрузки файла')
-        downloadURL.replace('0xff','')
-        response = requests.get(downloadURL)
+    # print('начинаем загрузку файла')
+    # try:
+    #     response = requests.get(downloadURL.encode())
+    # except:
+    #     print('ошибка загрузки файла')
+    #     # downloadURL.replace('0xff','')
+    #     response = requests.get(downloadURL)
         
     # response.raise_for_status() # вызывает исключение, если возникла ошибка при загрузке файла
     # fileName=f'{fileID}'
@@ -82,7 +82,8 @@ def get_url_record(fileID:str):
     # text = voice_processing(filename=fileName, response=response)
     # # logger.debug(f'{text}')
     with open(fileName, "wb") as file:
-        file.write(response.content)
+        # file.write(response.content)
+        file.write(downloadURL)
     
     # fileName = 'audio1492119703.mp3'
         
