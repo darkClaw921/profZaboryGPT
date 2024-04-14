@@ -68,7 +68,7 @@ def get_url_record(fileID:str):
     # print(downloadURL)
     print('начинаем загрузку файла')
     try:
-        response = requests.get(downloadURL)
+        response = requests.get(downloadURL.encode())
     except:
         print('ошибка загрузки файла')
         downloadURL.replace('0xff','')
