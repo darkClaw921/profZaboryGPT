@@ -65,10 +65,15 @@ def get_url_record(fileID:str):
     import requests
     downloadURL = client.get_record(fileID)   
     # bytes = client.get_record(fileID)  
-    print(downloadURL)
+    # print(downloadURL)
     print('начинаем загрузку файла')
-    print(downloadURL.replace('0xff',''))
-    response = requests.get(downloadURL)
+    try:
+        response = requests.get(downloadURL)
+    except:
+        print('ошибка загрузки файла')
+        downloadURL.replace('0xff','')
+        response = requests.get(downloadURL)
+        
     # response.raise_for_status() # вызывает исключение, если возникла ошибка при загрузке файла
     # fileName=f'{fileID}'
     # fileName = '/Users/igorgerasimov/Downloads/audio1492119703.mp3'
