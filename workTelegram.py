@@ -125,11 +125,16 @@ def say_welcome(message):
     lead_id = create_lead(userName=username, userID=userID)
     
     # lead_id =0
+    print(f'{lead_id=}')
     row = {'id': 'Uint64', 'MODEL_DIALOG': 'String', 'TEXT': 'String'}
     sql.create_table(str(message.chat.id), row)
     #row = {'id': message.chat.id, 'payload': '',}
     row = {'id': message.chat.id, 'model': 'model1', 'promt': 'promt1','nicname':username, 'payload': '','lead_id':lead_id}
-    sql.replace_query('user', row)
+    try:
+        sql.replace_query('user', row)
+    except:
+        row['lead_id'] = 0
+        sql.replace_query('user', row)
     
     text = """Здравствуйте, я AI ассистент компании ПрофЗаборы. Я отвечу на Ваши вопросы по теме строительства заборов 😁
 
