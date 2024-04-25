@@ -59,7 +59,7 @@ def create_lead(userName, userID):
     lead.trafickPath = 'Telegram'
     lead.pipeline=7810518
     leadID = lead.save()
-    return leadID
+    return leadID.id
     # Lead.create(name=userName)
     # Lead.save()
 

@@ -142,6 +142,7 @@ def say_welcome(message):
 
 Если у Вы уже определились какой забор вам нужен и хотите посчитать стоимость, то выберите «Калькулятор» 🧮"""
     a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {text}',timeout=1)
+    
     clear_history(message.chat.id)
     add_message_to_history(userID, 'assistant', text)
     bot.send_message(message.chat.id, text, 
