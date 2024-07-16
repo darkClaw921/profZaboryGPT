@@ -18,7 +18,7 @@ from workRedis import *
 import workGS
 from mapsWork import *
 import requests
-from amocrmWork import create_lead, create_contact, update_lead
+from amocrmWork import create_lead, create_contact, update_lead_contact,update_status_lead
 
 load_dotenv()
 isDEBUG = True
@@ -629,7 +629,7 @@ def any_message(message):
     add_message_to_history(userID, 'assistant', answer)
 
     prepareAnswer= answer.lower()
- 
+    answerPhone=prepareAnswer
     b = prepareAnswer.find('спасибо за предоставленный номер') 
     print(f'{b=}')
 
@@ -682,18 +682,23 @@ def any_message(message):
                 bot.send_message(message.chat.id, e,  parse_mode='markdown')
                 a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}') 
     if b >= 0:
-        print(f"{prepareAnswer.find('cпасибо за предоставленный номер')=}")
+        leadID = sql.get_leadID(userID)
+        print(f"{answerPhone.find('cпасибо за предоставленный номер')=}")
         PROMT_SUMMARY = gpt.load_prompt(PROMT_URL_SUMMARY)
-        history = get_history(str(userID))
-        history_answer = gpt.answer(PROMT_SUMMARY,history)[0]
+        # history = get_history(str(userID))
+        # history_answer = gpt.answer(PROMT_SUMMARY,history)[0]
+        history_answer = answerPhone
         print(f'{history_answer=}')
         print(f'{answer=}')
         #bot.send_message(message.chat.id, answer)
         phone = slice_str_phone(history_answer)
         pprint(f"{phone=}")
         
-        print('запиь в битрикс')
-        update_deal(phone, history_answer)
+        print('запиь в амо')
+        # update_deal(phone, history_answer)
+        contactID=create_contact(userName=username,phone=phone)
+        update_lead_contact(leadID=leadID,contactIDs=[contactID])
+        update_status_lead(leadID=leadID, statusID=64333482)
 
     
     now = datetime.now()+timedelta(hours=3)

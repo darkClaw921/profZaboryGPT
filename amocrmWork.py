@@ -58,6 +58,7 @@ def create_lead(userName, userID):
     lead.urlChatRoom = f'http://159.223.37.145:5004/room/{userID}'
     lead.trafickPath = 'Telegram'
     lead.pipeline=7810518
+    # status=66443482 # не завершил просчет
     leadID = lead.save()
     return leadID.id
     # Lead.create(name=userName)
@@ -67,11 +68,11 @@ def create_contact(userName, phone:str):
     # data = {'name'}
     contact = Contact()
     # contact.name = f'Клиент {userName} из Telegram'
-    contact.name = f'userName'
+    contact.name = f'{userName}'
     contact.phone= phone
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
     contactID = contact.save()
-    return contactID
+    return contactID.id
 
 def get_leadID_from_contact(phone:str):
     conta = Contact.objects.get(query=phone)
@@ -84,7 +85,7 @@ def get_leadID_from_contact(phone:str):
     # lead = Lead.objects.get(f'{leadID}')
 
 
-def update_lead(leadID, contactID):
+def update_lead_contact(leadID, contactIDs:list):
 
     # conta = Contact.objects.get(query='89308316687')
     # conta = Contact.objects.get(query=phone)
@@ -96,8 +97,17 @@ def update_lead(leadID, contactID):
     # lead.lead_card_budget=12448222
     # lead.record_text = """Менеджер провел успешный разговор с клиентом, который интересуется установкой забора между соседями. Он предложил разные варианты и предоставил информацию о материалах и ценах.
     
-    lead.contacts = [contactID]
+    lead.contacts = contactIDs
     # lead.record_text = text
+    lead.save()
+
+
+
+def update_status_lead(leadID, statusID):
+    """66443482 - не завершил просчет
+    64333482 - посчитан с контактом"""
+    lead = Lead.objects.get(f'{leadID}')
+    lead.status = statusID
     lead.save()
 
 def check_need_answered_for(leadID:int):
@@ -112,9 +122,10 @@ def check_need_answered_for(leadID:int):
 
 if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')
-    a = get_leadID_from_contact('79636201537')
-    print(a)
-    create_lead('igor',12414245)
+    # a = get_leadID_from_contact('79636201537')
+    # print(a)
+    # create_lead('igor',12414245)
+    update_status_lead('26613047', 64333482)
     # a = check_need_answered_for(leadID=435263)
     # print(a)
     # lead.record_text = 'text'
