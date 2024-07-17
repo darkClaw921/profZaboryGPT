@@ -85,7 +85,7 @@ def get_leadID_from_contact(phone:str):
     # lead = Lead.objects.get(f'{leadID}')
 
 
-def update_lead_contact(leadID, contactIDs:list):
+def update_lead_contact(leadID, contactID):
 
     # conta = Contact.objects.get(query='89308316687')
     # conta = Contact.objects.get(query=phone)
@@ -96,8 +96,15 @@ def update_lead_contact(leadID, contactIDs:list):
 
     # lead.lead_card_budget=12448222
     # lead.record_text = """Менеджер провел успешный разговор с клиентом, который интересуется установкой забора между соседями. Он предложил разные варианты и предоставил информацию о материалах и ценах.
-    
-    lead.contacts = contactIDs
+    # pprint(lead.__dict__)
+    # lead.__dict__['_data']['_embedded']['contacts'] = [contactID]
+    # contact = Contact.objects.get(f'{contactID}')
+    contact = Contact.objects.get(f'{contactID}')
+    # pprint(contact.__dict__)
+    contact.leads.append(lead)
+    # lead.company = Company(name="Amocrm")
+    # lead.contacts=[contactID]
+
     # lead.record_text = text
     lead.save()
 
@@ -118,14 +125,15 @@ def check_need_answered_for(leadID:int):
         return False
 
 
-
-
 if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')
     # a = get_leadID_from_contact('79636201537')
     # print(a)
+    pass
     # create_lead('igor',12414245)
-    update_status_lead('26613047', 64333482)
+    # update_status_lead('26613047', 64333482)
+    # update_lead_contact(26615083, 42615427)
+    # contact_add_lead(42615427, 26615083)
     # a = check_need_answered_for(leadID=435263)
     # print(a)
     # lead.record_text = 'text'
