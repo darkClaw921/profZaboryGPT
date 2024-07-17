@@ -292,9 +292,13 @@ def any_message(message):
         a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textAnswer}',timeout=1)
         bot.send_message(userID,textAnswer)
         
-        contactID = create_contact(userName=username,phone=phone[0])
+        # contactID = create_contact(userName=username,phone=phone[0])
         leadID=sql.get_leadID(userID)
-        update_lead(leadID=leadID,contactID=contactID)
+        # update_lead(leadID=leadID,contactID=contactID)
+
+        contactID=create_contact(userName=username,phone=phone[0])
+        update_lead_contact(leadID=leadID,contactIDs=[contactID])
+        update_status_lead(leadID=leadID, statusID=64333482)
         return 0
 
     if text == 'Калькулятор':

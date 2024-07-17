@@ -246,7 +246,7 @@ class Ydb:
         return rez
     
     def get_leadID(self, whereID: int):
-        query = f'SELECT leadID FROM user WHERE id = {whereID}'
+        query = f'SELECT lead_id FROM user WHERE id = {whereID}'
         print(query)
 
         def a(session):
@@ -255,7 +255,7 @@ class Ydb:
                 commit_tx=True,
             )
         b = pool.retry_operation_sync(a)
-        rez = b[0].rows[0]['leadID']
+        rez = b[0].rows[0]['lead_id']
         return rez
     
     
