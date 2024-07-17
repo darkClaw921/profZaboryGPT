@@ -297,7 +297,7 @@ def any_message(message):
         # update_lead(leadID=leadID,contactID=contactID)
 
         contactID=create_contact(userName=username,phone=phone[0])
-        update_lead_contact(leadID=leadID,contactIDs=contactID)
+        update_lead_contact(leadID=leadID,contactID=contactID)
         update_status_lead(leadID=leadID, statusID=64333482)
         return 0
 
