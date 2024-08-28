@@ -400,7 +400,8 @@ def send_values_in_sheet_no_keyboard(typeMaterial:str, values:list, sheetName:st
         sheet.send_cell('Z8', coverageValuesEvroShtak[int(values[4])])
         # sheet.send_cell('Z6', str(values[3]))
         # sheet.send_cell('Z8', str(values[4]))
-        sheet.send_cell('Z10', zazorValuesEvroShtak[int(values[5])])# зазор
+        # sheet.send_cell('Z10', zazorValuesEvroShtak[int(values[5])])# зазор
+        sheet.send_cell('Z10', int(values[5]))# зазор
         sheet.send_cell('Z16', values[6])
         sheet.send_cell('Z23', values[7])
         try:

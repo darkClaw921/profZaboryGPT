@@ -434,7 +434,16 @@ def any_message(message):
                 a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textError}',timeout=1)
                 logger.debug(f'{e=}')
                 time.sleep(2)
-                path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)
+                # path = send_values_in_sheet_no_keyboard(typeQuest1, answers, f'{username}_{QUESTS_USERS[userID][0][0]}', first=copyTable, mkad=distance)
+                del QUESTS_USERS[userID]
+                COUNT_ZABOR_USER[userID] = {'max':1,
+                                        'real': 1,
+                                        'profNastil': 1,
+                                        'evroShtak':1,
+                                        'GridRabit':1,
+                                        '3d':1,
+                                        'Zaluzi':1}
+
 
             COUNT_ZABOR_USER[userID][answers[0]] += 1
             copyTable = False
