@@ -447,8 +447,8 @@ def any_message(message):
         sheetSale= sheet.get_cell(173,3)
         # sheetSale = sheet.get_rom_value(a.row)[-1]
         nowDate, futureDate = get_dates(7, '%d-%m')
-        
-        update_lead_url_to_calc(leadID=leadID, url=tableURL)
+            
+            
         
         
         
@@ -489,6 +489,8 @@ def any_message(message):
                                         'Zaluzi':1}
             
             del QUESTS_USERS[userID] 
+            leadID=sql.get_leadID(userID) 
+            update_lead_url_to_calc(leadID=leadID, url=tableURL)    
             # bot.send_photo(userID, mapPath)
         return 0
 
