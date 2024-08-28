@@ -41,6 +41,7 @@ class Lead(_Lead):
     # noAnswerBot = custom_field.CheckboxCustomField('Не отвечать ботом',code='391359')
     urlChatRoom = custom_field.UrlCustomField('Чат с клиентом',code='776947')
     trafickPath = custom_field.TextAreaCustomField('Источник трафика',code='317031')
+    calcUrl = custom_field.UrlCustomField('Документ расчета',code='784929')
     # phone1 = custom_field.ContactPhoneField('phone')
 
 
@@ -124,6 +125,10 @@ def check_need_answered_for(leadID:int):
     else:
         return False
 
+def update_lead_url_to_calc(leadID:int, url:str):
+    lead = Lead.objects.get(f'{leadID}')
+    lead.calcUrl = url
+    lead.save()
 
 if __name__ ==  '__main__':
     # update_lead('640073', 'test text2')

@@ -18,7 +18,7 @@ from workRedis import *
 import workGS
 from mapsWork import *
 import requests
-from amocrmWork import create_lead, create_contact, update_lead_contact,update_status_lead
+from amocrmWork import create_lead, create_contact, update_lead_contact,update_status_lead, update_lead_url_to_calc
 
 load_dotenv()
 isDEBUG = True
@@ -440,13 +440,15 @@ def any_message(message):
             copyTable = False
             #path = send_values_in_sheet(typeQuest, QUESTS_USERS[userID], f'{username} {QUESTS_USERS[userID][0]}',)   
         sheet = Sheet('GDtxt.json',path,get_worksheet=1)
-        sheet.export_pdf(path)
+        urlPdf, tableURL= sheet.export_pdf(path)
         
         sheet = Sheet('GDtxt.json',path,get_worksheet=1) 
         # a= sheet.find_cell('Скидка')
         sheetSale= sheet.get_cell(173,3)
         # sheetSale = sheet.get_rom_value(a.row)[-1]
         nowDate, futureDate = get_dates(7, '%d-%m')
+        
+        update_lead_url_to_calc(leadID=leadID, url=tableURL)
         
         
         
@@ -487,7 +489,7 @@ def any_message(message):
                                         'Zaluzi':1}
             
             del QUESTS_USERS[userID] 
-            bot.send_photo(userID, mapPath)
+            # bot.send_photo(userID, mapPath)
         return 0
 
     if payload.startswith('quest'):

@@ -125,7 +125,10 @@ class Sheet():
         # with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
         with open('pdfCalc/'+namePdf + ".pdf", 'wb') as f:
             f.write(res.content)
-        return url
+        
+        tableURL=f'https://docs.google.com/spreadsheets/d/{self.sheetAll.id}'
+        
+        return url, tableURL
 
 @dataclass
 class table:
