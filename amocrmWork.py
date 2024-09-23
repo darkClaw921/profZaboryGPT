@@ -67,11 +67,15 @@ def create_lead(userName, userID):
 
 def create_contact(userName, phone:str):
     # data = {'name'}
+    contact=Contact.objects.get(query=phone)
+    if contact is not None:
+        return contact.id
     contact = Contact()
     # contact.name = f'Клиент {userName} из Telegram'
     contact.name = f'{userName}'
     contact.phone= phone
     # lead.record_text = f'http://myservice.ai-akedemi.ru/room/{userID}'
+    
     contactID = contact.save()
     return contactID.id
 
@@ -116,6 +120,15 @@ def update_status_lead(leadID, statusID):
     64333482 - посчитан с контактом"""
     lead = Lead.objects.get(f'{leadID}')
     lead.status = statusID
+    lead.save()
+
+def update_pipeline_lead(leadID, pipelineID):
+    """
+    7810518 - чат боты
+    1724242 - клиенты
+    """
+    lead = Lead.objects.get(f'{leadID}')
+    lead.pipeline = pipelineID
     lead.save()
 
 def check_need_answered_for(leadID:int):

@@ -18,7 +18,7 @@ from workRedis import *
 import workGS
 from mapsWork import *
 import requests
-from amocrmWork import create_lead, create_contact, update_lead_contact,update_status_lead, update_lead_url_to_calc
+from amocrmWork import create_lead, create_contact, update_lead_contact,update_status_lead, update_lead_url_to_calc,update_pipeline_lead
 
 load_dotenv()
 isDEBUG = True
@@ -298,7 +298,10 @@ def any_message(message):
 
         contactID=create_contact(userName=username,phone=phone[0])
         update_lead_contact(leadID=leadID,contactID=contactID)
-        update_status_lead(leadID=leadID, statusID=64333482)
+
+        update_pipeline_lead(leadID=leadID, pipeline=1724242)#Клиенты
+        
+        update_status_lead(leadID=leadID, statusID=25923499)#первичный контакт
         return 0
 
     if text == 'Калькулятор':
@@ -499,7 +502,10 @@ def any_message(message):
             
             del QUESTS_USERS[userID] 
             leadID=sql.get_leadID(userID) 
-            update_lead_url_to_calc(leadID=leadID, url=tableURL)    
+            update_lead_url_to_calc(leadID=leadID, url=tableURL)   
+            textPhone='Оставьте пожалуйста свой номер телефона для связи с вами в международном формате (например +79123456789)'
+            a = requests.post(f'{CHAT_ROOM_URL}/message/{userID}/Бот: {textPhone}',timeout=1)
+            bot.send_message(userID,textPhone) 
             # bot.send_photo(userID, mapPath)
         return 0
 

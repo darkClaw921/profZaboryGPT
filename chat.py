@@ -48,7 +48,7 @@ class bcolors:
 
 class GPT():
   modelVersion = ''
-  def __init__(self,modelVersion:str = 'gpt-3.5-turbo-16k'):
+  def __init__(self,modelVersion:str = 'gpt-4o-mini'):
     self.modelVersion = modelVersion
     pass
 

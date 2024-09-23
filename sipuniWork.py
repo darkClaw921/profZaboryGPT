@@ -199,7 +199,11 @@ def main():
             #иногда нужно повторить
             logger.debug('отправляем в gpt')
             try:
-                promt1='напиши по строчкам кто горорил Клиент: или Оператор: учитывай что первый говорил Оператор:'
+                if call['\ufeffТип'] == 'Исходящий':
+                    promt1='напиши по строчкам кто горорил Клиент: или Оператор: учитывай что первый говорил Клиент:'
+                else:    
+                    promt1='напиши по строчкам кто горорил Клиент: или Оператор: учитывай что первый говорил Оператор:'
+                    
                 answerGPTPrepare = gpt.answer(promt1,[{"role": "user", "content": text}])[0]
                 print(f'{answerGPTPrepare=}')
                 answerGPT = gpt.answer(promt,[{"role": "user", "content": answerGPTPrepare}])[0]
@@ -213,6 +217,9 @@ def main():
             logger.debug('получили ответ от gpt')
             ball, rez, good, bad, recomend = prepare_answer_gpt(answerGPT=answerGPT)
             print(answerGPT)
+            promtBall='Преобразуйте текст в баллы если балы написаны в тексте то переведи их в цифру если 4/9 то просто 4 если 5 баллов то 5 если 3/9 В результате, менеджер выполнил только 3 пункта из 9, перечисленных в чек-листе контроля качества то 3 и так далее. В ответ ты должен отправить только цифру'
+            ball= gpt.answer(promtBall,[{"role": "user", "content": ball}])[0] 
+            
             lst=[date, assignedCRM, urlDeal, duration, ball, rez, good, bad, recomend, answerGPT, phone, answerGPTPrepare, call['\ufeffТип']]
 
             tab={
